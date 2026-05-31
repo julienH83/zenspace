@@ -1,0 +1,11 @@
+# Réécriture d'URL : toutes les requêtes (sauf les fichiers réels comme les
+# images, le CSS, le JS) sont redirigées vers index.php (front controller).
+RewriteEngine On
+
+# Si le fichier ou le dossier demandé existe réellement, on le sert directement.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Sinon, on passe la main à index.php.
+RewriteRule ^ index.php [QSA,L]

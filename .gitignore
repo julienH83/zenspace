@@ -1,0 +1,13 @@
+# Fichiers d'environnement (contiennent des secrets)
+.env
+
+# Dépendances PHP
+/src/vendor/
+
+# Logs et fichiers temporaires
+*.log
+.DS_Store
+Thumbs.db
+
+# Données Docker locales (si jamais montées localement)
+/data/

@@ -1,0 +1,44 @@
+# Orchestration des conteneurs du projet ZenSpace.
+# 3 services : le serveur web (PHP/Apache), la base relationnelle (MySQL),
+# et la base non relationnelle (MongoDB).
+services:
+  # --- Serveur web : PHP 8.2 + Apache ---
+  web:
+    build: .
+    container_name: zenspace_web
+    ports:
+      - "8080:80"            # http://localhost:8080 -> port 80 du conteneur
+    volumes:
+      - ./src:/var/www/html  # le code est monté en direct (pratique en développement)
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - mongo
+
+  # --- Base de données relationnelle ---
+  mysql:
+    image: mysql:8.0
+    container_name: zenspace_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: zenspace
+    ports:
+      - "3307:3306"          # accès depuis l'hôte sur le port 3307
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # --- Base de données non relationnelle (statistiques) ---
+  mongo:
+    image: mongo:7
+    container_name: zenspace_mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+
+# Volumes nommés : les données survivent à l'arrêt des conteneurs.
+volumes:
+  mysql_data:
+  mongo_data:
