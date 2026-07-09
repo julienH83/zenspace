@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers\Admin;
 
+use App\Core\AuditLog;
 use App\Core\Controller;
 use App\Core\Auth;
 use App\Core\Csrf;
@@ -86,6 +87,7 @@ final class EmployeeController extends Controller
         $this->requireRole(['admin']);
         Csrf::validate();
         (new UserRepository())->setActive((int) $id, false);
+        AuditLog::record('employee.deactivate', $id);
         Flash::success('Compte employé désactivé.');
         $this->redirect('/admin/employes');
     }

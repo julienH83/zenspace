@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers\Admin;
 
+use App\Core\AuditLog;
 use App\Core\Controller;
 use App\Core\Csrf;
 use App\Core\Flash;
@@ -132,6 +133,7 @@ final class AdminServiceController extends Controller
         $this->requireRole(['employe', 'admin']);
         Csrf::validate();
         (new ServiceRepository())->delete((int) $id);
+        AuditLog::record('service.delete', $id);
         Flash::success('Prestation désactivée.');
         $this->redirect('/admin/prestations');
     }

@@ -14,12 +14,12 @@ RUN apt-get update && apt-get install -y \
 # Extension PDO MySQL : accès à la base relationnelle.
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Extension MongoDB : accès à la base non relationnelle.
-RUN pecl install mongodb \
-    && docker-php-ext-enable mongodb
+# Extensions MongoDB (base non relationnelle) et Redis (cache / rate-limit).
+RUN pecl install mongodb redis \
+    && docker-php-ext-enable mongodb redis
 
-# Activation du module Apache de réécriture d'URL (pour les jolies URLs).
-RUN a2enmod rewrite
+# Modules Apache : réécriture d'URL (jolies URLs) + en-têtes de sécurité.
+RUN a2enmod rewrite headers
 
 # Configuration PHP de développement (OPcache revérifie le code à chaque requête,
 # affichage des erreurs activé). Évite les surprises liées au cache lors des modifs.

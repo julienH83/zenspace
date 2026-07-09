@@ -27,27 +27,28 @@ final class Database
     public static function getConnection(): PDO
     {
         if (self::$instance === null) {
-            $host = $_ENV['DB_HOST'] ?? 'mysql';
-            $port = $_ENV['DB_PORT'] ?? '3306';
-            $name = $_ENV['DB_NAME'] ?? 'zenspace';
-            $user = $_ENV['DB_USER'] ?? 'root';
-            $pass = $_ENV['DB_PASS'] ?? 'root';
+            // Hôte/port/nom : valeurs par défaut non sensibles acceptables.
+            $host = env('DB_HOST', 'mysql');
+            $port = env('DB_PORT', '3306');
+            $name = env('DB_NAME', 'zenspace');
+            // Identifiants : JAMAIS de fallback « root » en dur. On exige les
+            // variables d'environnement (principe du moindre privilège).
+            $user = env_required('DB_USER');
+            $pass = env_required('DB_PASS');
 
             $dsn = "mysql:host={$host};port={$port};dbname={$name};charset=utf8mb4";
 
             try {
                 self::$instance = new PDO($dsn, $user, $pass, [
-                    // Lève une exception en cas d'erreur SQL (plus facile à déboguer).
                     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                    // Récupère les résultats sous forme de tableaux associatifs.
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    // Vraies requêtes préparées côté serveur (sécurité).
-                    PDO::ATTR_EMULATE_PREPARES   => false,
+                    PDO::ATTR_EMULATE_PREPARES   => false,   // vraies requêtes préparées (sécurité)
                 ]);
             } catch (PDOException $e) {
-                // En production on n'expose jamais le détail de l'erreur.
-                http_response_code(500);
-                exit('Erreur de connexion à la base de données.');
+                error_log('[Database] ' . $e->getMessage());
+                // En production on n'expose jamais le détail ; en dev on aide au débogage.
+                $detail = (env('APP_ENV') === 'dev') ? ' (' . $e->getMessage() . ')' : '';
+                throw new \App\Core\HttpException(500, 'Erreur de connexion à la base de données.' . $detail);
             }
         }
 

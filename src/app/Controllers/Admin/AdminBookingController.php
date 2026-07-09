@@ -49,17 +49,17 @@ final class AdminBookingController extends Controller
         $repo = new BookingRepository();
         $booking = $repo->findById((int) $id);
         if ($booking === null) {
-            http_response_code(404);
-            $this->render('errors/404', ['title' => 'Réservation introuvable']);
-            return;
+            $this->notFound('Réservation introuvable.');
         }
 
+        $previousStatus = $booking['status'];
         $repo->updateStatus((int) $id, $status);
 
         // --- Alimentation de la base NoSQL pour les statistiques ---
-        // Quand la prestation est réalisée, on enregistre un document analytique.
-        if ($status === 'completed') {
-            Mongo::insert('revenue', [
+        // Seulement lors d'une VRAIE transition vers « terminée », et via upsert
+        // (clé booking_id) : repasser à « completed » ne double plus le CA.
+        if ($status === 'completed' && $previousStatus !== 'completed') {
+            Mongo::upsert('revenue', ['booking_id' => (int) $booking['id']], [
                 'booking_id'    => (int) $booking['id'],
                 'service_id'    => (int) $booking['service_id'],
                 'service_title' => $booking['service_title'],
@@ -69,6 +69,10 @@ final class AdminBookingController extends Controller
         }
 
         Flash::success('Statut mis à jour.');
-        $this->redirect('/admin/reservations' . ($status ? '?status=' . urlencode($_GET['status'] ?? '') : ''));
+
+        // Conserve le filtre courant transmis par le formulaire (champ caché),
+        // au lieu de lire $_GET sur une requête POST (qui n'en a pas).
+        $filter = $_POST['current_filter'] ?? '';
+        $this->redirect('/admin/reservations' . ($filter !== '' ? '?status=' . urlencode($filter) : ''));
     }
 }

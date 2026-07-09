@@ -82,7 +82,7 @@ final class ServiceRepository
     public function findBySlug(string $slug): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT s.*, c.label AS category_label
+            'SELECT s.*, c.label AS category_label, c.slug AS category_slug
              FROM service s
              JOIN category c ON c.id = s.category_id
              WHERE s.slug = :slug'
@@ -109,6 +109,12 @@ final class ServiceRepository
         return $this->db->query('SELECT * FROM category ORDER BY label')->fetchAll();
     }
 
+    /** Nombre de prestations actives (COUNT(*)). */
+    public function countActive(): int
+    {
+        return (int) $this->db->query('SELECT COUNT(*) FROM service WHERE is_active = 1')->fetchColumn();
+    }
+
     public function create(array $d): int
     {
         $stmt = $this->db->prepare(
@@ -130,11 +136,13 @@ final class ServiceRepository
 
     public function update(int $id, array $d): void
     {
+        // COALESCE : si aucune nouvelle image n'est fournie, on conserve l'actuelle
+        // (corrige le bug où l'image n'était jamais mise à jour).
         $stmt = $this->db->prepare(
             'UPDATE service
              SET category_id = :category_id, title = :title, slug = :slug,
                  description = :description, duration_min = :duration_min,
-                 price = :price, is_active = :is_active
+                 price = :price, image = COALESCE(:image, image), is_active = :is_active
              WHERE id = :id'
         );
         $stmt->execute([
@@ -145,6 +153,7 @@ final class ServiceRepository
             'description'  => $d['description'],
             'duration_min' => $d['duration_min'],
             'price'        => $d['price'],
+            'image'        => $d['image'] ?? null,
             'is_active'    => $d['is_active'] ?? 1,
         ]);
     }

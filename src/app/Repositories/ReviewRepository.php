@@ -53,6 +53,41 @@ final class ReviewRepository
         return $stmt->fetchAll();
     }
 
+    /** Avis validés d'une prestation donnée (affichés sur sa fiche). */
+    public function findValidatedByService(int $serviceId, int $limit = 10): array
+    {
+        $limit = max(1, min(50, $limit));
+        $stmt = $this->db->prepare(
+            "SELECT r.rating, r.comment, r.created_at, u.first_name
+             FROM review r
+             JOIN user u ON u.id = r.user_id
+             WHERE r.service_id = :sid AND r.is_validated = 1
+             ORDER BY r.created_at DESC
+             LIMIT {$limit}"
+        );
+        $stmt->execute(['sid' => $serviceId]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Résumé de note d'une prestation : moyenne + nombre d'avis validés.
+     *
+     * @return array{avg: ?float, count: int}
+     */
+    public function ratingSummary(int $serviceId): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT AVG(rating) AS avg, COUNT(*) AS count
+             FROM review WHERE service_id = :sid AND is_validated = 1'
+        );
+        $stmt->execute(['sid' => $serviceId]);
+        $row = $stmt->fetch() ?: ['avg' => null, 'count' => 0];
+        return [
+            'avg'   => $row['avg'] !== null ? (float) $row['avg'] : null,
+            'count' => (int) $row['count'],
+        ];
+    }
+
     /** Avis en attente de modération. */
     public function findPending(): array
     {
@@ -65,6 +100,12 @@ final class ReviewRepository
              ORDER BY r.created_at ASC'
         );
         return $stmt->fetchAll();
+    }
+
+    /** Nombre d'avis en attente de modération (COUNT(*)). */
+    public function countPending(): int
+    {
+        return (int) $this->db->query('SELECT COUNT(*) FROM review WHERE is_validated = 0')->fetchColumn();
     }
 
     public function existsForBooking(int $bookingId): bool

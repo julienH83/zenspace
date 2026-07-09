@@ -10,6 +10,30 @@ declare(strict_types=1);
 use App\Core\View;
 use App\Core\Csrf;
 
+if (!function_exists('env')) {
+    /**
+     * Lit une variable d'environnement (.env chargé dans $_ENV, ou getenv()).
+     * Retourne $default si absente.
+     */
+    function env(string $key, ?string $default = null): ?string
+    {
+        $value = $_ENV[$key] ?? getenv($key);
+        return ($value === false || $value === null || $value === '') ? $default : $value;
+    }
+}
+
+if (!function_exists('env_required')) {
+    /** Comme env() mais lève une exception si la variable est absente (secrets prod). */
+    function env_required(string $key): string
+    {
+        $value = env($key);
+        if ($value === null) {
+            throw new \RuntimeException("Variable d'environnement obligatoire manquante : {$key}");
+        }
+        return $value;
+    }
+}
+
 if (!function_exists('e')) {
     /** Échappe une valeur pour l'affichage HTML (protection XSS). */
     function e(?string $value): string

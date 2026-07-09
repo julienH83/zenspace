@@ -20,41 +20,66 @@ final class StatsController extends Controller
     {
         $this->requireRole(['admin']);
 
-        // Filtre optionnel par période (date de début / fin).
-        $filter = [];
-        if (!empty($_GET['from'])) {
-            $filter['date']['$gte'] = $_GET['from'];
+        // Filtre optionnel par période. Les dates sont STRICTEMENT validées au
+        // format Y-m-d : si l'on reçoit autre chose (ex. ?from[$gt]= → tableau),
+        // on l'ignore. Corrige l'injection NoSQL : aucune valeur non scalaire
+        // n'atteint le filtre Mongo.
+        $from = $this->validDate($_GET['from'] ?? null);
+        $to   = $this->validDate($_GET['to'] ?? null);
+
+        $match = [];
+        if ($from !== null) {
+            $match['date']['$gte'] = $from;
         }
-        if (!empty($_GET['to'])) {
-            $filter['date']['$lte'] = $_GET['to'];
+        if ($to !== null) {
+            $match['date']['$lte'] = $to;
         }
 
-        $documents = Mongo::findAll('revenue', $filter);
+        // Agrégation NATIVE MongoDB ($group + $sum) plutôt qu'en PHP : plus
+        // performant et démonstratif de la maîtrise NoSQL.
+        $pipeline = [];
+        if ($match !== []) {
+            $pipeline[] = ['$match' => $match];
+        }
+        $pipeline[] = ['$group' => [
+            '_id'     => '$service_title',
+            'revenue' => ['$sum' => '$amount'],
+            'count'   => ['$sum' => 1],
+        ]];
+        $pipeline[] = ['$sort' => ['revenue' => -1]];
 
-        // Agrégation côté PHP : CA + nombre par prestation.
+        $rows = Mongo::aggregate('revenue', $pipeline);
+
         $byService = [];
         $totalRevenue = 0.0;
-        foreach ($documents as $doc) {
-            $title = $doc->service_title ?? 'Inconnu';
-            $amount = (float) ($doc->amount ?? 0);
-            $totalRevenue += $amount;
-            if (!isset($byService[$title])) {
-                $byService[$title] = ['count' => 0, 'revenue' => 0.0];
-            }
-            $byService[$title]['count']++;
-            $byService[$title]['revenue'] += $amount;
+        $totalCount = 0;
+        foreach ($rows as $row) {
+            $title = (string) ($row->_id ?? 'Inconnu');
+            $revenue = (float) ($row->revenue ?? 0);
+            $count = (int) ($row->count ?? 0);
+            $byService[$title] = ['count' => $count, 'revenue' => $revenue];
+            $totalRevenue += $revenue;
+            $totalCount += $count;
         }
-        // Tri décroissant par chiffre d'affaires (prestation la plus rentable en tête).
-        uasort($byService, static fn($a, $b) => $b['revenue'] <=> $a['revenue']);
 
         $this->render('admin/stats/index', [
             'title'        => 'Statistiques',
             'byService'    => $byService,
             'totalRevenue' => $totalRevenue,
-            'totalCount'   => count($documents),
-            'from'         => $_GET['from'] ?? '',
-            'to'           => $_GET['to'] ?? '',
+            'totalCount'   => $totalCount,
+            'from'         => $from ?? '',
+            'to'           => $to ?? '',
             'layout_admin' => true,
         ]);
+    }
+
+    /** Valide une date au format Y-m-d ; renvoie null si invalide ou non scalaire. */
+    private function validDate(mixed $raw): ?string
+    {
+        if (!is_string($raw) || $raw === '') {
+            return null;
+        }
+        $d = \DateTime::createFromFormat('Y-m-d', $raw);
+        return ($d && $d->format('Y-m-d') === $raw) ? $raw : null;
     }
 }

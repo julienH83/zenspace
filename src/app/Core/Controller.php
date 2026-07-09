@@ -64,10 +64,14 @@ class Controller
     {
         $user = $this->requireLogin();
         if (!in_array($user['role'], $roles, true)) {
-            http_response_code(403);
-            $this->render('errors/403', ['title' => 'Accès refusé']);
-            exit;
+            throw new HttpException(403, 'Accès refusé.');
         }
         return $user;
+    }
+
+    /** Lève une 404 propre (gabarit stylisé via le handler global). */
+    protected function notFound(string $message = 'Page introuvable.'): never
+    {
+        throw new HttpException(404, $message);
     }
 }

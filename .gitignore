@@ -1,8 +1,18 @@
 # Fichiers d'environnement (contiennent des secrets)
 .env
 
+# Secrets Docker (production)
+/secrets/
+
 # Dépendances PHP
 /src/vendor/
+/vendor/
+
+# Dépendances et artefacts JS / tests
+/node_modules/
+/cypress/screenshots/
+/cypress/videos/
+.phpunit.cache/
 
 # Logs et fichiers temporaires
 *.log

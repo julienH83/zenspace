@@ -17,6 +17,9 @@ final class Auth
     {
         // Régénère l'identifiant de session pour éviter la fixation de session.
         session_regenerate_id(true);
+        $_SESSION['id_created'] = time();
+        // Régénère aussi le jeton CSRF (anti-rejeu d'un ancien jeton).
+        unset($_SESSION['csrf_token']);
         $_SESSION['user'] = [
             'id'         => (int) $user['id'],
             'first_name' => $user['first_name'],
@@ -26,9 +29,25 @@ final class Auth
         ];
     }
 
+    /** Déconnexion COMPLÈTE : vide la session, supprime le cookie, détruit la session. */
     public static function logout(): void
     {
-        unset($_SESSION['user']);
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $p = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                [
+                    'expires'  => time() - 42000,
+                    'path'     => $p['path'],
+                    'domain'   => $p['domain'],
+                    'secure'   => $p['secure'],
+                    'httponly' => $p['httponly'],
+                    'samesite' => $p['samesite'] ?: 'Lax',
+                ]
+            );
+        }
         session_destroy();
     }
 

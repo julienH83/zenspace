@@ -1,0 +1,6 @@
+# Le contenu de storage/ (mails de dev, compteurs rate-limit, cache) n'est pas
+# versionné, mais on garde l'arborescence.
+*
+!.gitignore
+!*/
+!*/.gitkeep
