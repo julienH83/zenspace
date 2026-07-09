@@ -24,9 +24,7 @@ final class BookingController extends Controller
         $this->requireLogin();
         $service = (new ServiceRepository())->findById((int) $id);
         if ($service === null) {
-            http_response_code(404);
-            $this->render('errors/404', ['title' => 'Prestation introuvable']);
-            return;
+            $this->notFound('Prestation introuvable.');
         }
 
         $this->render('booking/form', [
@@ -44,9 +42,7 @@ final class BookingController extends Controller
         $serviceRepo = new ServiceRepository();
         $service = $serviceRepo->findById((int) $id);
         if ($service === null) {
-            http_response_code(404);
-            $this->render('errors/404', ['title' => 'Prestation introuvable']);
-            return;
+            $this->notFound('Prestation introuvable.');
         }
 
         $date = $_POST['booking_date'] ?? '';
@@ -76,13 +72,29 @@ final class BookingController extends Controller
             return;
         }
 
-        $bookings->create([
-            'user_id'      => $user['id'],
-            'service_id'   => (int) $id,
-            'booking_date' => $date,
-            'time_slot'    => $slot . ':00',
-            'total_price'  => $service['price'],
-        ]);
+        try {
+            $bookings->create([
+                'user_id'      => $user['id'],
+                'service_id'   => (int) $id,
+                'booking_date' => $date,
+                'time_slot'    => $slot . ':00',
+                'total_price'  => $service['price'],
+            ]);
+        } catch (\PDOException $e) {
+            // 23000 = violation de contrainte d'intégrité (créneau déjà pris,
+            // y compris course entre la vérification et l'insertion). On affiche
+            // un message clair au lieu d'une erreur fatale.
+            if ($e->getCode() === '23000') {
+                $this->render('booking/form', [
+                    'title'   => 'Réserver — ' . $service['title'],
+                    'service' => $service,
+                    'slots'   => self::SLOTS,
+                    'errors'  => ['Ce créneau vient d\'être réservé. Merci d\'en choisir un autre.'],
+                ]);
+                return;
+            }
+            throw $e;   // toute autre erreur remonte au handler global
+        }
 
         Flash::success('Votre réservation a bien été enregistrée. Elle est en attente de confirmation.');
         $this->redirect('/mon-compte');
@@ -106,9 +118,7 @@ final class BookingController extends Controller
 
         // Un client ne peut voir que SES réservations.
         if ($booking === null || (int) $booking['user_id'] !== (int) $user['id']) {
-            http_response_code(404);
-            $this->render('errors/404', ['title' => 'Réservation introuvable']);
-            return;
+            $this->notFound('Réservation introuvable.');
         }
 
         $this->render('booking/show', [
@@ -127,9 +137,7 @@ final class BookingController extends Controller
         $booking = $repo->findById((int) $id);
 
         if ($booking === null || (int) $booking['user_id'] !== (int) $user['id']) {
-            http_response_code(404);
-            $this->render('errors/404', ['title' => 'Réservation introuvable']);
-            return;
+            $this->notFound('Réservation introuvable.');
         }
 
         // Annulation possible uniquement tant que ce n'est pas confirmé/terminé.

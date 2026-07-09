@@ -9,6 +9,7 @@
 use App\Core\Auth;
 use App\Core\Csrf;
 use App\Core\Flash;
+use App\Core\Seo;
 use App\Core\View;
 
 $user      = Auth::user();
@@ -20,13 +21,13 @@ $appName   = $_ENV['APP_NAME'] ?? 'ZenSpace';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= View::e($title ?? '') ?> — <?= View::e($appName) ?></title>
-    <meta name="description" content="Institut de bien-être : massages, soins du visage, spa. Réservez en ligne.">
-    <!-- Polices Google : Cormorant Garamond (titres, esprit spa premium) + Nunito Sans (texte) -->
+    <?= Seo::tags($seo ?? []) ?>
+    <!-- Polices Google : Fraunces (titres, serif raffiné) + Inter (texte) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/app.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <?php $cssV = @filemtime(($_SERVER['DOCUMENT_ROOT'] ?? '') . '/assets/css/app.css'); ?>
+    <link rel="stylesheet" href="/assets/css/app.css<?= $cssV ? '?v=' . $cssV : '' ?>">
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
@@ -65,8 +66,19 @@ $appName   = $_ENV['APP_NAME'] ?? 'ZenSpace';
 <?php $messages = Flash::pull(); ?>
 <?php if ($messages): ?>
     <div class="container flash-zone">
+        <?php // Messages non bloquants (succès / info) : annoncés poliment. ?>
+        <div class="flash-zone" role="status" aria-live="polite" aria-atomic="true">
+            <?php foreach ($messages as $m): ?>
+                <?php if (($m['type'] ?? '') !== 'error'): ?>
+                    <div class="flash flash-<?= View::e($m['type']) ?>"><?= View::e($m['message']) ?></div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+        <?php // Erreurs : annoncées immédiatement (role="alert"). ?>
         <?php foreach ($messages as $m): ?>
-            <div class="flash flash-<?= View::e($m['type']) ?>"><?= View::e($m['message']) ?></div>
+            <?php if (($m['type'] ?? '') === 'error'): ?>
+                <div class="flash flash-error" role="alert"><?= View::e($m['message']) ?></div>
+            <?php endif; ?>
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
@@ -103,7 +115,7 @@ $appName   = $_ENV['APP_NAME'] ?? 'ZenSpace';
             <p>Institut de bien-être — 1 rue du Spa, 33000 Bordeaux</p>
         </div>
         <div>
-            <h3>Horaires</h3>
+            <h2>Horaires</h2>
             <ul class="hours">
                 <li>Lundi – Vendredi : 9h – 18h</li>
                 <li>Samedi : 9h – 13h</li>
@@ -111,12 +123,12 @@ $appName   = $_ENV['APP_NAME'] ?? 'ZenSpace';
             </ul>
         </div>
         <div>
-            <h3>Informations</h3>
+            <h2>Informations</h2>
             <a href="/contact">Nous contacter</a>
         </div>
     </div>
     <div class="footer-bottom">
-        <small>© <?= date('Y') ?> <?= View::e($appName) ?> — Projet DWWM.</small>
+        <small>© <?= date('Y') ?> <?= View::e($appName) ?> — Tous droits réservés. Projet DWWM.</small>
     </div>
 </footer>
 

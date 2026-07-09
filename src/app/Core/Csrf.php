@@ -35,12 +35,23 @@ final class Csrf
             && hash_equals($_SESSION['csrf_token'], $token);
     }
 
-    /** Bloque la requête si le jeton est invalide. */
+    /** Bloque la requête (formulaire POST classique) si le jeton est invalide. */
     public static function validate(): void
     {
         if (!self::check($_POST['csrf_token'] ?? null)) {
-            http_response_code(419);
-            exit('Jeton de sécurité invalide ou expiré. Veuillez réessayer.');
+            throw new HttpException(419, 'Jeton de sécurité invalide ou expiré. Veuillez réessayer.');
+        }
+    }
+
+    /**
+     * Validation pour les requêtes fetch/AJAX : le jeton est transmis via
+     * l'en-tête X-CSRF-Token (ou le corps JSON), pas via $_POST.
+     */
+    public static function validateHeader(): void
+    {
+        $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? null);
+        if (!self::check(is_string($token) ? $token : null)) {
+            throw new HttpException(419, 'Jeton de sécurité invalide.');
         }
     }
 }

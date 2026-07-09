@@ -37,7 +37,8 @@
                     <td>
                         <form action="/admin/reservations/<?= (int) $b['id'] ?>/statut" method="post" class="inline-form">
                             <?= csrf() ?>
-                            <select name="status" onchange="this.form.submit()">
+                            <input type="hidden" name="current_filter" value="<?= e($currentStatus) ?>">
+                            <select name="status" onchange="this.form.submit()" aria-label="Changer le statut de la réservation #<?= (int) $b['id'] ?>">
                                 <?php foreach ($statuses as $st): ?>
                                     <option value="<?= e($st) ?>" <?= ($b['status'] === $st) ? 'selected' : '' ?>>
                                         <?= e(status_label($st)) ?>

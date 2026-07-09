@@ -1,6 +1,6 @@
 # Orchestration des conteneurs du projet ZenSpace.
-# 3 services : le serveur web (PHP/Apache), la base relationnelle (MySQL),
-# et la base non relationnelle (MongoDB).
+# Services : serveur web (PHP/Apache), base relationnelle (MySQL),
+# base non relationnelle (MongoDB) et cache/rate-limit (Redis).
 services:
   # --- Serveur web : PHP 8.2 + Apache ---
   web:
@@ -15,6 +15,7 @@ services:
     depends_on:
       - mysql
       - mongo
+      - redis
 
   # --- Base de données relationnelle ---
   mysql:
@@ -22,8 +23,13 @@ services:
     container_name: zenspace_mysql
     command: --default-authentication-plugin=mysql_native_password
     environment:
+      # En production : utiliser des secrets Docker (MYSQL_ROOT_PASSWORD_FILE…)
+      # plutôt que des valeurs en clair. Le compte applicatif dédié ci-dessous
+      # est créé automatiquement sur un volume vierge (moindre privilège).
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: zenspace
+      MYSQL_USER: zenspace_app
+      MYSQL_PASSWORD: ZenspaceApp_2026_Secret
     ports:
       - "3307:3306"          # accès depuis l'hôte sur le port 3307
     volumes:
@@ -37,6 +43,14 @@ services:
       - "27018:27017"
     volumes:
       - mongo_data:/data/db
+
+  # --- Cache / rate-limiting / sessions (optionnel en dev) ---
+  redis:
+    image: redis:7-alpine
+    container_name: zenspace_redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6380:6379"          # accès depuis l'hôte sur le port 6380
 
 # Volumes nommés : les données survivent à l'arrêt des conteneurs.
 volumes:

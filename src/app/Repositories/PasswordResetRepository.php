@@ -47,4 +47,11 @@ final class PasswordResetRepository
         $stmt = $this->db->prepare('UPDATE password_reset SET used = 1 WHERE id = :id');
         $stmt->execute(['id' => $id]);
     }
+
+    /** Marque comme utilisés tous les jetons encore actifs d'un utilisateur. */
+    public function invalidateAllForUser(int $userId): void
+    {
+        $stmt = $this->db->prepare('UPDATE password_reset SET used = 1 WHERE user_id = :uid AND used = 0');
+        $stmt->execute(['uid' => $userId]);
+    }
 }

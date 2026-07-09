@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  # --- Qualité : lint PHP + tests unitaires ---
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_mysql, mongodb
+          coverage: none
+
+      - name: Lint PHP (php -l sur tout src/)
+        run: find src -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Installer les dépendances
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Tests unitaires (PHPUnit)
+        run: vendor/bin/phpunit --testsuite unit
+
+  # --- Tests de bout en bout : app réelle via Docker + Cypress ---
+  e2e:
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Préparer le fichier .env (identifiants alignés sur docker-compose)
+        run: |
+          cat > .env <<'EOF'
+          APP_ENV=dev
+          APP_NAME=ZenSpace
+          APP_URL=http://localhost:8080
+          DB_HOST=mysql
+          DB_PORT=3306
+          DB_NAME=zenspace
+          DB_USER=zenspace_app
+          DB_PASS=ZenspaceApp_2026_Secret
+          MONGO_URI=mongodb://mongo:27017
+          MONGO_DB=zenspace_stats
+          RATE_LIMIT_DRIVER=file
+          MAIL_TRANSPORT=log
+          APP_SECRET=ci-secret-aleatoire-pour-tests
+          EOF
+
+      - name: Démarrer les conteneurs
+        run: docker compose up -d --build
+
+      - name: Attendre MySQL
+        run: |
+          for i in $(seq 1 60); do
+            if docker exec zenspace_mysql mysqladmin ping -uroot -proot --silent 2>/dev/null | grep -q "is alive"; then
+              echo "MySQL prêt"; break
+            fi
+            sleep 2
+          done
+
+      - name: Charger le schéma, les données et la migration
+        run: |
+          docker exec -i zenspace_mysql mysql -uroot -proot zenspace < db/schema.sql
+          docker exec -i zenspace_mysql mysql -uroot -proot zenspace < db/seed.sql
+          docker exec -i zenspace_mysql mysql -uroot -proot zenspace < db/migrations/2026_06_01_hardening.sql || true
+
+      - name: Attendre le serveur web
+        run: |
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ || true)
+            if [ "$code" = "200" ]; then echo "Web prêt"; break; fi
+            sleep 2
+          done
+
+      - name: Installer Node + Cypress
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Lancer Cypress
+        run: |
+          npm install cypress --no-save
+          npx cypress run
+
+      - name: Logs en cas d'échec
+        if: failure()
+        run: docker compose logs --tail=100
+
+  # --- Déploiement (exemple) : uniquement sur la branche principale ---
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [quality, e2e]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Déploiement
+        run: echo "Brancher ici le déploiement (build image prod avec prod.ini, push registry, migrate, bascule)."

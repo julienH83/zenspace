@@ -10,12 +10,18 @@ namespace App\Core;
  * Associe une méthode HTTP + un chemin (ex: GET /prestation/{slug}) à une
  * action de contrôleur (ex: [ServiceController::class, 'show']).
  *
- * Les segments entre accolades ({id}, {slug}) sont des paramètres dynamiques
- * transmis à l'action.
+ * Les segments entre accolades sont des paramètres dynamiques :
+ *   {id}            → capture « tout sauf / »
+ *   {id:\d+}        → capture contrainte par une expression régulière
+ *   {slug:[a-z0-9\-]+}
+ *
+ * Le routeur distingue :
+ *   - 404 : aucun chemin ne correspond
+ *   - 405 : le chemin existe mais pas pour cette méthode HTTP (+ en-tête Allow)
  */
 final class Router
 {
-    /** @var array<int, array{method:string, pattern:string, handler:array}> */
+    /** @var array<int, array{method:string, pattern:string, path:string, handler:array}> */
     private array $routes = [];
 
     public function get(string $path, array $handler): void
@@ -33,44 +39,62 @@ final class Router
         $this->routes[] = [
             'method'  => $method,
             'pattern' => $this->compile($path),
+            'path'    => $path,
             'handler' => $handler,
         ];
     }
 
-    /** Transforme "/prestation/{slug}" en expression régulière. */
+    /**
+     * Transforme un chemin avec paramètres en expression régulière.
+     * Gère {nom} (défaut [^/]+) et {nom:regex} (contrainte personnalisée).
+     */
     private function compile(string $path): string
     {
-        $regex = preg_replace('#\{[a-zA-Z_]+\}#', '([^/]+)', $path);
+        $regex = preg_replace_callback(
+            '#\{([a-zA-Z_][a-zA-Z0-9_]*)(?::([^}]+))?\}#',
+            static fn(array $m): string => '(' . ($m[2] ?? '[^/]+') . ')',
+            $path
+        );
         return '#^' . $regex . '$#';
     }
 
     /**
      * Trouve la route correspondant à la requête courante et exécute l'action.
+     * Lève une HttpException (404 ou 405) traitée par le handler global.
      */
     public function dispatch(string $method, string $uri): void
     {
-        // On retire la query string (?cat=...) et le slash final.
         $path = rtrim(parse_url($uri, PHP_URL_PATH) ?? '/', '/');
         if ($path === '') {
             $path = '/';
         }
 
+        $allowedMethods = [];
+
         foreach ($this->routes as $route) {
+            if (!preg_match($route['pattern'], $path, $matches)) {
+                continue;
+            }
             if ($route['method'] !== $method) {
+                $allowedMethods[$route['method']] = true;   // chemin connu, autre méthode
                 continue;
             }
 
-            if (preg_match($route['pattern'], $path, $matches)) {
-                array_shift($matches); // on retire la correspondance complète
-                [$class, $action] = $route['handler'];
-                $controller = new $class();
-                $controller->$action(...$matches);
-                return;
-            }
+            array_shift($matches); // retire la correspondance complète
+            $matches = array_map('urldecode', $matches);
+            [$class, $action] = $route['handler'];
+            (new $class())->$action(...$matches);
+            return;
         }
 
-        // Aucune route : page 404.
-        http_response_code(404);
-        (new \App\Core\Controller())->render('errors/404', ['title' => 'Page introuvable']);
+        // Le chemin existe mais la méthode n'est pas autorisée → 405.
+        if ($allowedMethods !== []) {
+            throw new HttpException(405, 'Méthode non autorisée.', [
+                'Allow' => implode(', ', array_keys($allowedMethods)),
+            ]);
+        }
+
+        // Aucun chemin ne correspond → 404.
+        throw new HttpException(404, 'Page introuvable.');
     }
 }

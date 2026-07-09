@@ -26,9 +26,9 @@ final class DashboardController extends Controller
         $this->render('admin/dashboard', [
             'title'           => 'Espace de gestion',
             'user'            => $user,
-            'pendingBookings' => count($bookings->findAll('pending')),
-            'pendingReviews'  => count($reviews->findPending()),
-            'totalServices'   => count($services->findAll()),
+            'pendingBookings' => $bookings->countByStatus('pending'),
+            'pendingReviews'  => $reviews->countPending(),
+            'totalServices'   => $services->countActive(),
             'layout_admin'    => true,
         ]);
     }

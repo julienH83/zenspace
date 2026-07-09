@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Seo;
 use App\Repositories\ServiceRepository;
 use App\Repositories\ReviewRepository;
 
@@ -22,6 +23,11 @@ final class HomeController extends Controller
             'title'    => 'Accueil',
             'services' => array_slice($services->findActive(), 0, 3),
             'reviews'  => $reviews->findValidated(3),
+            'seo'      => [
+                'title'       => 'ZenSpace — Institut de bien-être à Bordeaux',
+                'description' => 'Massages, soins du visage, spa et méditation guidée. Réservez votre parenthèse de sérénité en ligne, en quelques clics.',
+                'jsonld'      => Seo::organization(),
+            ],
         ]);
     }
 }

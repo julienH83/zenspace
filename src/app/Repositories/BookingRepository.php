@@ -115,6 +115,41 @@ final class BookingRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * Créneaux déjà réservés (non annulés) pour une prestation, sur une période.
+     * Retourne un ensemble dont les clés sont "Y-m-d H:i" (test d'existence rapide).
+     *
+     * @return array<string, true>
+     */
+    public function takenSlots(int $serviceId, string $from, string $to): array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT booking_date, time_slot FROM booking
+             WHERE service_id = :sid AND status <> 'cancelled'
+               AND booking_date BETWEEN :from AND :to"
+        );
+        $stmt->execute(['sid' => $serviceId, 'from' => $from, 'to' => $to]);
+        $set = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $set[$row['booking_date'] . ' ' . substr((string) $row['time_slot'], 0, 5)] = true;
+        }
+        return $set;
+    }
+
+    /** Compte les réservations par statut (COUNT(*) — pas de chargement complet). */
+    public function countByStatus(?string $status = null): int
+    {
+        $sql = 'SELECT COUNT(*) FROM booking';
+        $params = [];
+        if ($status !== null && $status !== '') {
+            $sql .= ' WHERE status = :status';
+            $params['status'] = $status;
+        }
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return (int) $stmt->fetchColumn();
+    }
+
     public function statusHistory(int $bookingId): array
     {
         $stmt = $this->db->prepare(
