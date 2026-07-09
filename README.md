@@ -1,5 +1,7 @@
 # ZenSpace — Réservation de prestations bien-être
 
+[![CI](https://github.com/julienH83/zenspace/actions/workflows/ci.yml/badge.svg)](https://github.com/julienH83/zenspace/actions/workflows/ci.yml)
+
 Application web de réservation de prestations pour un institut de bien-être.
 Les visiteurs consultent le catalogue de prestations, filtrent en direct, créent un
 compte, réservent un créneau et suivent leurs réservations. Les employés gèrent les
@@ -98,9 +100,11 @@ cp .env.example .env
 # 2. Construire et lancer les conteneurs (web + MySQL + MongoDB)
 docker compose up -d --build
 
-# 3. Créer le schéma + jeu de données de démo (dans cet ordre)
+# 3. Créer le schéma + jeu de données de démo (ordre impératif)
 docker compose exec -T mysql mysql -uroot -proot zenspace < db/schema.sql
 docker compose exec -T mysql mysql -uroot -proot zenspace < db/seed.sql
+docker compose exec -T mysql mysql -uroot -proot zenspace < db/migrations/2026_06_01_hardening.sql
+docker compose exec -T mysql mysql -uroot -proot zenspace < db/seed_articles.sql
 
 # 4. Ouvrir l'application
 #    http://localhost:8080
@@ -127,9 +131,11 @@ reservation-prestations/
 ├── docker-compose.yml        # Orchestration des 3 conteneurs
 ├── Dockerfile                # Image PHP + Apache
 ├── .env.example              # Variables d'environnement (modèle)
+├── render.yaml                # Blueprint de déploiement (Render)
 ├── db/
 │   ├── schema.sql            # Création des tables (base relationnelle)
-│   └── seed.sql              # Données de démonstration
+│   ├── seed.sql               # Données de démonstration
+│   └── migrations/            # Migrations versionnées (appliquées après schema.sql)
 ├── docker/apache/vhost.conf  # Configuration Apache
 ├── docs/                     # Documentation (déploiement, sécurité, BDD)
 └── src/
