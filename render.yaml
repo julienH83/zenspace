@@ -1,0 +1,69 @@
+# Blueprint Render — déploiement de ZenSpace.
+# Documentation : https://render.com/docs/blueprint-spec
+#
+# Ce blueprint déploie :
+#   - le service web (build à partir du Dockerfile du dépôt)
+#   - un service Redis managé (rate limiting)
+#
+# MySQL et MongoDB ne sont pas proposés en base managée par Render : voir
+# docs/DEPLOIEMENT.md §3 pour les options (MongoDB Atlas, hébergeur MySQL externe).
+# Les variables DB_* et MONGO_URI sont donc déclarées `sync: false` : à renseigner
+# manuellement dans le dashboard Render une fois ces bases créées.
+
+services:
+  - type: web
+    name: zenspace-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: APP_ENV
+        value: prod
+      - key: APP_NAME
+        value: ZenSpace
+      - key: APP_URL
+        fromService:
+          type: web
+          name: zenspace-web
+          property: host
+      - key: APP_SECRET
+        generateValue: true
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB
+        value: zenspace_stats
+      - key: RATE_LIMIT_DRIVER
+        value: redis
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: zenspace-redis
+          property: connectionString
+      - key: MAIL_TRANSPORT
+        value: log
+      - key: MAIL_FROM
+        value: no-reply@zenspace.fr
+      - key: STRIPE_SECRET
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PUBLIC
+        sync: false
+
+  - type: redis
+    name: zenspace-redis
+    plan: free
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
