@@ -191,6 +191,7 @@ button:focus-visible,
 }
 .main-nav a:hover,
 .main-nav a:focus-visible { text-decoration: underline; text-decoration-thickness: 1px; }
+.main-nav a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .3em; }
 
 .auth-nav { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
 .user-hello { color: var(--muted); font-size: .9rem; }
@@ -476,6 +477,7 @@ table.data, .data { width: 100%; border-collapse: collapse; }
     color: var(--text); text-decoration: none; font-weight: 500;
 }
 .admin-sidebar nav a:hover { color: var(--accent); }
+.admin-sidebar nav a[aria-current="page"] { color: var(--accent); font-weight: 700; }
 .admin-main { min-width: 0; }
 
 /* =====================================================================

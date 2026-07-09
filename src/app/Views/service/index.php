@@ -47,7 +47,7 @@ $fMaxDuration = (int) ($filters['max_duration'] ?? 0) ?: 120;
                 <a class="card card-link" href="/prestation/<?= e($s['slug']) ?>">
                     <?php if (!empty($s['image'])): ?>
                         <div class="card-media">
-                            <img src="/assets/images/<?= e($s['image']) ?>" alt="<?= e($s['title']) ?>" loading="lazy">
+                            <img src="/assets/images/<?= e($s['image']) ?>" alt="" loading="lazy">
                         </div>
                     <?php endif; ?>
                     <div class="card-body">
