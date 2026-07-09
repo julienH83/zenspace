@@ -6,8 +6,9 @@
 <?php else: ?>
     <div class="grid">
         <?php foreach ($reviews as $r): ?>
+            <?php $stars = max(0, min(5, (int) $r['rating'])); ?>
             <div class="review">
-                <p class="stars"><?= str_repeat('★', (int) $r['rating']) . str_repeat('☆', 5 - (int) $r['rating']) ?></p>
+                <p class="stars" aria-label="Note : <?= $stars ?> sur 5"><?= str_repeat('★', $stars) . str_repeat('☆', 5 - $stars) ?></p>
                 <p><?= e($r['comment'] ?: '(Pas de commentaire)') ?></p>
                 <p class="muted">
                     <strong><?= e($r['first_name'] . ' ' . $r['last_name']) ?></strong>

@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function cardHtml(s) {
         const price = Number(s.price).toFixed(2).replace('.', ',') + ' €';
         const media = s.image
-            ? `<div class="card-media"><img src="/assets/images/${escapeHtml(s.image)}" alt="${escapeHtml(s.title)}" loading="lazy"></div>`
+            ? `<div class="card-media"><img src="/assets/images/${escapeHtml(s.image)}" alt="" loading="lazy"></div>`
             : '';
         return `
             <a class="card card-link" href="/prestation/${encodeURIComponent(s.slug)}">

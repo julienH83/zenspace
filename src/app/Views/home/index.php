@@ -39,7 +39,7 @@
                 <a class="card card-link" href="/prestation/<?= e($s['slug']) ?>">
                     <?php if (!empty($s['image'])): ?>
                         <div class="card-media">
-                            <img src="/assets/images/<?= e($s['image']) ?>" alt="<?= e($s['title']) ?>" loading="lazy">
+                            <img src="/assets/images/<?= e($s['image']) ?>" alt="" loading="lazy">
                         </div>
                     <?php endif; ?>
                     <div class="card-body">
@@ -58,8 +58,9 @@
         <h2>Ils nous ont fait confiance</h2>
         <div class="grid">
             <?php foreach ($reviews as $r): ?>
+                <?php $stars = max(0, min(5, (int) $r['rating'])); ?>
                 <figure class="review">
-                    <p class="stars" aria-hidden="true"><?= str_repeat('★', (int) $r['rating']) . str_repeat('☆', 5 - (int) $r['rating']) ?></p>
+                    <p class="stars" aria-label="Note : <?= $stars ?> sur 5"><?= str_repeat('★', $stars) . str_repeat('☆', 5 - $stars) ?></p>
                     <blockquote><?= e($r['comment']) ?></blockquote>
                     <figcaption class="muted"><strong><?= e($r['first_name']) ?></strong> — <?= e($r['service_title']) ?></figcaption>
                 </figure>

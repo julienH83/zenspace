@@ -15,6 +15,10 @@ use App\Core\View;
 $user      = Auth::user();
 $isAdminUi = $layout_admin ?? false;
 $appName   = $_ENV['APP_NAME'] ?? 'ZenSpace';
+$currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+$navCurrent  = static fn(string $path): string => $path === $currentPath ? ' aria-current="page"' : '';
+$navSection  = static fn(string $path): string => ($path === $currentPath || str_starts_with((string) $currentPath, $path . '/'))
+    ? ' aria-current="page"' : '';
 ?>
 <!doctype html>
 <html lang="fr">
@@ -37,11 +41,11 @@ $appName   = $_ENV['APP_NAME'] ?? 'ZenSpace';
         <a href="/" class="brand"><?= View::e($appName) ?></a>
 
         <nav class="main-nav" aria-label="Navigation principale">
-            <a href="/">Accueil</a>
-            <a href="/prestations">Prestations</a>
-            <a href="/contact">Contact</a>
+            <a href="/"<?= $navCurrent('/') ?>>Accueil</a>
+            <a href="/prestations"<?= $navCurrent('/prestations') ?>>Prestations</a>
+            <a href="/contact"<?= $navCurrent('/contact') ?>>Contact</a>
             <?php if ($user && in_array($user['role'], ['employe', 'admin'], true)): ?>
-                <a href="/admin">Espace gestion</a>
+                <a href="/admin"<?= $navCurrent('/admin') ?>>Espace gestion</a>
             <?php endif; ?>
         </nav>
 
@@ -89,13 +93,13 @@ $appName   = $_ENV['APP_NAME'] ?? 'ZenSpace';
             <aside class="admin-sidebar">
                 <h2 class="sidebar-title">Gestion</h2>
                 <nav aria-label="Navigation gestion">
-                    <a href="/admin">Tableau de bord</a>
-                    <a href="/admin/prestations">Prestations</a>
-                    <a href="/admin/reservations">Réservations</a>
-                    <a href="/admin/avis">Avis</a>
+                    <a href="/admin"<?= $navCurrent('/admin') ?>>Tableau de bord</a>
+                    <a href="/admin/prestations"<?= $navSection('/admin/prestations') ?>>Prestations</a>
+                    <a href="/admin/reservations"<?= $navSection('/admin/reservations') ?>>Réservations</a>
+                    <a href="/admin/avis"<?= $navSection('/admin/avis') ?>>Avis</a>
                     <?php if ($user && $user['role'] === 'admin'): ?>
-                        <a href="/admin/employes">Employés</a>
-                        <a href="/admin/statistiques">Statistiques</a>
+                        <a href="/admin/employes"<?= $navSection('/admin/employes') ?>>Employés</a>
+                        <a href="/admin/statistiques"<?= $navSection('/admin/statistiques') ?>>Statistiques</a>
                     <?php endif; ?>
                 </nav>
             </aside>
