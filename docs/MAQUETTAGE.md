@@ -16,12 +16,15 @@ Sommaire :
 
 ## 1. Intentions & contraintes
 
-**Positionnement** : institut de bien-être haut de gamme à Bordeaux. L'interface
-doit évoquer le calme, la confiance et le raffinement — jamais l'agitation.
+**Positionnement** : institut de bien-être à Bordeaux. L'interface doit évoquer
+le calme et la confiance, tout en restant un **site de services** clair et
+orienté **réservation** (et non une revue éditoriale).
 
-**Parti pris visuel** : minimalisme éditorial (« magazine ») — beaucoup d'espace
-blanc, une typographie serif soignée, un unique accent vert sauge, des photos
-plein cadre. La profondeur (ombres douces, micro-animations) reste discrète.
+**Parti pris visuel** : site de services moderne — typographie sans-serif unique
+(Inter), titres compacts, mise en page structurée et dense, marque affirmée
+(barre utilitaire, pastille de marque, bouton « Réserver » toujours visible),
+accent vert sauge, pied de page sombre. La profondeur (ombres douces,
+micro-animations d'apparition) reste discrète.
 
 **Contraintes** :
 - **Mobile-first** : conception pensée d'abord pour le téléphone, puis élargie.
@@ -61,12 +64,13 @@ courant). L'accent est utilisé avec parcimonie : la couleur signale l'action.
 
 | Usage | Police | Graisses | Remarque |
 |---|---|---|---|
-| Titres | **Fraunces** (serif) | 500 / 600 | Caractère éditorial, `opsz` optique |
-| Texte courant | **Inter** (sans-serif) | 400–700 | Lisibilité écran |
+| Titres | **Inter** | 700 / 800 | Compacts, `letter-spacing` négatif |
+| Texte courant | **Inter** | 400–600 | Lisibilité écran |
 
-Échelle de titres fluide via `clamp()` (s'adapte de mobile à grand écran) :
-`h1` ~2 → 2.8 rem · `h2` ~1.8 → 2.6 rem · `h3` ~1.3 → 1.6 rem. Corps de texte
-1.05 rem, interligne 1.65.
+Une seule famille (Inter) du texte aux titres : cohérent avec un site de
+services (et non une revue). Échelle de titres fluide via `clamp()` :
+`h1` ~1.9 → 2.5 rem · `h2` ~1.5 → 2 rem · `h3` 1.2 rem. Corps de texte 1 rem,
+interligne 1.6.
 
 ### 2.3 Échelle d'espacement & géométrie (design tokens)
 
@@ -79,15 +83,17 @@ courant). L'accent est utilisé avec parcimonie : la couleur signale l'action.
 
 - **Icônes** : jeu SVG *inline* (aucune dépendance externe), trait fin 1.6,
   `currentColor` (héritent la couleur du texte). Cf. `Views/partials/icons.php`.
-- **Logo / wordmark** : le nom « ZenSpace » composé en Fraunces 600 fait office
-  de marque (pas de logo figuratif) — cohérent avec le parti pris éditorial.
+- **Logo / wordmark** : une pastille carrée à coins arrondis portant l'initiale
+  « Z » (fond vert accent) accolée au nom « ZenSpace » en Inter 800 — repère de
+  marque simple, présent en en-tête et en pied de page.
 
 ### 2.5 Inventaire des composants
 
 - **Boutons** : `primaire` (fond accent), `fantôme` (contour), `danger` (action
   destructive) ; états survol (léger soulèvement + ombre), actif, désactivé.
-- **Cartes** : image (ratio 4:3) + corps ; toute la carte est un lien ; élévation
-  au survol + léger zoom de l'image ; note en étoiles sous le titre.
+- **Cartes de prestation** : image (ratio 4:3) + corps (catégorie, titre lien,
+  note en étoiles, durée) et un pied **prix + bouton « Réserver »** ; élévation
+  au survol + léger zoom de l'image.
 - **Formulaires** : label au-dessus, focus clavier visible, erreurs signalées par
   couleur **et** contour + message lié (`aria-describedby`).
 - **Badges de statut** : pilules colorées (en attente / confirmée / terminée / annulée).
@@ -104,30 +110,32 @@ Wireframes basse fidélité (zoning) — la hiérarchie et les blocs, sans le st
 
 ```
 ┌──────────────────────────────────────────────┐
-│  ZenSpace     Accueil Prestations Contact  [Connexion][Compte] │  en-tête sticky
+│ ☎ 05 56… · Lun–Ven 9h–18h        1 rue du Spa │  barre utilitaire
 ├──────────────────────────────────────────────┤
-│                                                │
-│      HÉRO plein cadre (photo + voile)          │
-│      Kicker · Titre serif · Sous-titre         │
-│      [Découvrir les prestations] [Comment ?]   │
+│ [Z] ZenSpace   Accueil Prestations Contact   Connexion [Réserver] │  en-tête sticky
 ├──────────────────────────────────────────────┤
-│  NOS ENGAGEMENTS (bande sable)                 │
-│  [icône] Cadre  [icône] Praticiens  [icône] Résa│
+│  HÉRO deux colonnes                            │
+│  Kicker · Titre · Sous-titre        │  [photo] │
+│  [Voir les prestations] [Contact]   │          │
+│  ✓ diplômés ✓ en ligne ✓ fidélité   │          │
 ├──────────────────────────────────────────────┤
-│  NOTRE MAISON   [photo] | texte + lien         │
+│  NOS PRESTATIONS PHARES        « tout le cat.» │  ← services en premier
+│  [carte] [carte] [carte]                       │
+│   image · cat · titre · ★ · durée              │
+│   ─────────────  prix   [Réserver]             │
 ├──────────────────────────────────────────────┤
-│  PRESTATIONS PHARES            « voir tout »   │
-│  [carte] [carte] [carte]   (image, titre, ★, prix)│
+│  NOS ENGAGEMENTS (bande) [icône]×3             │
 ├──────────────────────────────────────────────┤
-│  COMMENT ÇA SE PASSE (bande) 1—2—3—4 étapes    │
+│  COMMENT ÇA SE PASSE   1—2—3—4 étapes          │
 ├──────────────────────────────────────────────┤
-│  MAGAZINE  [article][article][article]         │
+│  AVIS (bande)  [citation ★★★★★] …               │
 ├──────────────────────────────────────────────┤
-│  AVIS  [citation ★★★★★] …                       │
+│  CONSEILS BIEN-ÊTRE (magazine, secondaire)     │  ← relégué en bas
+│  [lien article] [lien article] [lien article]  │
 ├──────────────────────────────────────────────┤
 │  BANDE CTA verte : « Prêt·e ? » [Réserver]     │
 ├──────────────────────────────────────────────┤
-│  PIED : adresse | horaires | explorer          │
+│  PIED SOMBRE : marque | coord. | horaires | liens │
 └──────────────────────────────────────────────┘
 ```
 
