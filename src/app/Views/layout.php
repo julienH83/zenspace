@@ -25,10 +25,6 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?php // Marque « JS actif » au plus tôt : évite tout clignotement des sections
-          // à apparition différée. Sans JS, la classe n'est jamais posée et tout
-          // le contenu reste visible (amélioration progressive). ?>
-    <script>document.documentElement.classList.add('js');</script>
     <?= Seo::tags($seo ?? []) ?>
     <!-- Police : Inter (une seule famille, du texte aux titres) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -162,6 +158,7 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
     </div>
 </footer>
 
-<script src="/assets/js/app.js" defer></script>
+<?php $jsV = @filemtime(($_SERVER['DOCUMENT_ROOT'] ?? '') . '/assets/js/app.js'); ?>
+<script src="/assets/js/app.js<?= $jsV ? '?v=' . $jsV : '' ?>" defer></script>
 </body>
 </html>

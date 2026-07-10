@@ -18,11 +18,10 @@ function initReveal() {
     const els = document.querySelectorAll('.reveal');
     if (!els.length) return;
 
+    const revealAll = () => els.forEach((el) => el.classList.add('reveal-armed', 'is-visible'));
+
     // Repli : sans IntersectionObserver, on affiche tout immédiatement.
-    if (!('IntersectionObserver' in window)) {
-        els.forEach((el) => el.classList.add('is-visible'));
-        return;
-    }
+    if (!('IntersectionObserver' in window)) { revealAll(); return; }
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -31,9 +30,14 @@ function initReveal() {
                 observer.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
 
-    els.forEach((el) => observer.observe(el));
+    // On « arme » (masque) puis on observe, dans la même passe : seul ce script
+    // pose .reveal-armed, donc un app.js manquant/obsolète ne peut rien masquer.
+    els.forEach((el) => { el.classList.add('reveal-armed'); observer.observe(el); });
+
+    // Filet de sécurité : tout révéler après 2 s, même si un observateur reste muet.
+    setTimeout(revealAll, 2000);
 }
 
 /* --- 2. Ombre de l'en-tête au défilement -------------------------- */

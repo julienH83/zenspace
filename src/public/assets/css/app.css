@@ -669,18 +669,22 @@ table.data, .data { width: 100%; border-collapse: collapse; }
    ===================================================================== */
 
 /* --- Apparition douce au défilement -------------------------------- */
-/* Robuste : l'état masqué n'est appliqué QUE si JavaScript est actif
-   (classe .js posée sur <html> par app.js). Sans JS, le contenu reste
-   parfaitement visible. Neutralisé si l'utilisateur préfère moins d'animations. */
-.js .reveal {
+/* ROBUSTE : l'état masqué n'est appliqué QUE lorsque le app.js COURANT a
+   « armé » l'élément (classe .reveal-armed posée en JavaScript juste avant
+   d'observer). Conséquence : sans JS, ou avec un app.js absent/obsolète/en
+   cache, la classe n'est jamais posée et le contenu reste toujours visible —
+   impossible de se retrouver avec une section blanche. Un filet de sécurité
+   (setTimeout dans app.js) révèle tout au bout de 2 s quoi qu'il arrive.
+   Neutralisé si l'utilisateur préfère moins d'animations. */
+.reveal-armed {
     opacity: 0;
     transform: translateY(18px);
     transition: opacity .6s var(--ease), transform .6s var(--ease);
     will-change: opacity, transform;
 }
-.js .reveal.is-visible { opacity: 1; transform: none; }
+.reveal-armed.is-visible { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
-    .js .reveal { opacity: 1; transform: none; transition: none; }
+    .reveal-armed { opacity: 1; transform: none; transition: none; }
 }
 
 /* --- Icônes inline (SVG, sans dépendance externe) ------------------ */
