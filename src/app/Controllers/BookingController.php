@@ -10,6 +10,7 @@ use App\Core\Csrf;
 use App\Core\Flash;
 use App\Repositories\ServiceRepository;
 use App\Repositories\BookingRepository;
+use App\Repositories\LoyaltyRepository;
 
 /**
  * Réservations côté client : formulaire, création, liste, détail, annulation.
@@ -104,9 +105,16 @@ final class BookingController extends Controller
     {
         $user = $this->requireLogin();
         $repo = new BookingRepository();
+        $loyalty = new LoyaltyRepository();
+
         $this->render('booking/list', [
-            'title'    => 'Mes réservations',
-            'bookings' => $repo->findByUser((int) $user['id']),
+            'title'          => 'Mes réservations',
+            'bookings'       => $repo->findByUser((int) $user['id']),
+            // Programme de fidélité : solde + derniers mouvements (points gagnés
+            // à chaque prestation terminée). Le solde est toujours recalculé
+            // depuis le grand-livre (jamais stocké), donc jamais désynchronisé.
+            'loyaltyPoints'  => $loyalty->balance((int) $user['id']),
+            'loyaltyHistory' => $loyalty->history((int) $user['id']),
         ]);
     }
 

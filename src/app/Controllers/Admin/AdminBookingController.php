@@ -9,6 +9,7 @@ use App\Core\Csrf;
 use App\Core\Flash;
 use App\Core\Mongo;
 use App\Repositories\BookingRepository;
+use App\Repositories\LoyaltyRepository;
 
 /**
  * Gestion des réservations par les employés/admins : liste filtrable + suivi de
@@ -55,10 +56,11 @@ final class AdminBookingController extends Controller
         $previousStatus = $booking['status'];
         $repo->updateStatus((int) $id, $status);
 
-        // --- Alimentation de la base NoSQL pour les statistiques ---
-        // Seulement lors d'une VRAIE transition vers « terminée », et via upsert
-        // (clé booking_id) : repasser à « completed » ne double plus le CA.
+        // --- Effets métier d'une VRAIE transition vers « terminée » ---
+        // Garde `previousStatus !== 'completed'` : repasser une réservation déjà
+        // terminée à « terminée » ne réécrit rien (ni CA en double, ni points en double).
         if ($status === 'completed' && $previousStatus !== 'completed') {
+            // 1) Statistiques de chiffre d'affaires (base NoSQL, upsert idempotent).
             Mongo::upsert('revenue', ['booking_id' => (int) $booking['id']], [
                 'booking_id'    => (int) $booking['id'],
                 'service_id'    => (int) $booking['service_id'],
@@ -66,6 +68,19 @@ final class AdminBookingController extends Controller
                 'amount'        => (float) $booking['total_price'],
                 'date'          => date('Y-m-d'),
             ]);
+
+            // 2) Programme de fidélité : 1 point par euro dépensé, crédité au client.
+            //    Le grand-livre (loyalty_ledger) conserve chaque mouvement avec son
+            //    motif et la réservation d'origine (traçabilité + solde recalculable).
+            $points = (int) round((float) $booking['total_price']);
+            if ($points > 0) {
+                (new LoyaltyRepository())->award(
+                    (int) $booking['user_id'],
+                    $points,
+                    'Réservation terminée',
+                    (int) $booking['id']
+                );
+            }
         }
 
         Flash::success('Statut mis à jour.');
