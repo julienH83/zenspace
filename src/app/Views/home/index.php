@@ -2,12 +2,13 @@
 /** @var array $services @var array $reviews @var array $articles */
 include __DIR__ . '/../partials/icons.php';
 ?>
-<!-- Héros à deux colonnes : discours + appels à l'action à gauche, photo à droite. -->
+<!-- Héros premium à deux colonnes : discours + CTA à gauche, photo habillée à droite. -->
 <section class="hero">
+    <span class="hero-glow" aria-hidden="true"></span>
     <div class="container hero-grid">
         <div class="hero-content">
-            <p class="hero-kicker">Institut de bien-être · Bordeaux</p>
-            <h1>Réservez votre soin bien-être en quelques clics</h1>
+            <p class="hero-kicker"><span class="kicker-dot" aria-hidden="true"></span>Institut de bien-être · Bordeaux</p>
+            <h1>Réservez votre <span class="hl">soin bien-être</span> en quelques clics</h1>
             <p class="hero-lede">Massages, soins du visage, spa &amp; hammam. Choisissez votre prestation,
                votre créneau, et laissez-vous porter.</p>
             <div class="hero-actions">
@@ -22,9 +23,23 @@ include __DIR__ . '/../partials/icons.php';
         </div>
         <div class="hero-media">
             <?= picture('hero-spa.jpg', 'Ambiance apaisante de l\'institut ZenSpace', 'eager') ?>
+            <div class="hero-chip">
+                <span class="stars" aria-hidden="true">★★★★★</span>
+                <span><strong>4,9/5</strong> · avis clients</span>
+            </div>
         </div>
     </div>
 </section>
+
+<!-- Bandeau de chiffres-clés : crédibilité immédiate (look site pro). -->
+<div class="stats-band">
+    <div class="container stats-grid">
+        <div class="stat"><span class="stat-num">15<span class="stat-unit">+</span></span><span class="stat-label">ans d'expérience</span></div>
+        <div class="stat"><span class="stat-num">6</span><span class="stat-label">prestations signature</span></div>
+        <div class="stat"><span class="stat-num">4,9<span class="stat-unit">/5</span></span><span class="stat-label">note moyenne</span></div>
+        <div class="stat"><span class="stat-num">2000<span class="stat-unit">+</span></span><span class="stat-label">soins prodigués</span></div>
+    </div>
+</div>
 
 <!-- Prestations mises en avant, dès l'entrée (cœur du site). -->
 <section class="section reveal">

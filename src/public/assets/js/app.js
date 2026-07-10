@@ -88,7 +88,7 @@ function initCatalogueFilters() {
             ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
-    // Carte de prestation : média + titre liés à la fiche, bouton « Réserver ».
+    // Carte de prestation premium : média + badge prix, puce catégorie, CTA.
     function cardHtml(s) {
         const href = '/prestation/' + encodeURIComponent(s.slug);
         const price = Number(s.price).toFixed(2).replace('.', ',') + ' €';
@@ -98,16 +98,16 @@ function initCatalogueFilters() {
             : '';
         return `
             <article class="card service-card">
-                ${media}
+                <div class="card-media-wrap">
+                    ${media}
+                    <span class="price-badge">${price}</span>
+                </div>
                 <div class="card-body">
-                    <span class="tag">${escapeHtml(s.category_label)}</span>
+                    <span class="tag-chip">${escapeHtml(s.category_label)}</span>
                     <h3><a href="${href}">${escapeHtml(s.title)}</a></h3>
                     ${starsHtml(s.rating_avg, s.rating_count)}
-                    <p class="meta">${s.duration_min} min</p>
-                    <div class="card-foot">
-                        <span class="price">${price}</span>
-                        <a class="btn btn-primary btn-sm" href="${href}">Réserver</a>
-                    </div>
+                    <p class="meta meta-duration">${s.duration_min} min</p>
+                    <a class="btn btn-primary btn-sm card-cta" href="${href}">Réserver ce soin</a>
                 </div>
             </article>`;
     }
