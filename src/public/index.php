@@ -25,6 +25,7 @@ use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\AdminServiceController;
 use App\Controllers\Admin\AdminBookingController;
 use App\Controllers\Admin\AdminReviewController;
+use App\Controllers\Admin\AdminArticleController;
 use App\Controllers\Admin\EmployeeController;
 use App\Controllers\Admin\StatsController;
 
@@ -82,6 +83,14 @@ $router->post('/admin/reservations/{id:\d+}/statut', [AdminBookingController::cl
 $router->get('/admin/avis', [AdminReviewController::class, 'index']);
 $router->post('/admin/avis/{id:\d+}/valider', [AdminReviewController::class, 'validate']);
 $router->post('/admin/avis/{id:\d+}/refuser', [AdminReviewController::class, 'reject']);
+
+// --- Back-office magazine (rédaction d'articles) ---
+$router->get('/admin/magazine', [AdminArticleController::class, 'index']);
+$router->get('/admin/magazine/nouveau', [AdminArticleController::class, 'createForm']);
+$router->post('/admin/magazine/nouveau', [AdminArticleController::class, 'create']);
+$router->get('/admin/magazine/{id:\d+}/editer', [AdminArticleController::class, 'editForm']);
+$router->post('/admin/magazine/{id:\d+}/editer', [AdminArticleController::class, 'update']);
+$router->post('/admin/magazine/{id:\d+}/supprimer', [AdminArticleController::class, 'delete']);
 
 // --- Réservé à l'administrateur ---
 $router->get('/admin/employes', [EmployeeController::class, 'index']);
