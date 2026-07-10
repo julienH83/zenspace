@@ -30,19 +30,28 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
           // le contenu reste visible (amélioration progressive). ?>
     <script>document.documentElement.classList.add('js');</script>
     <?= Seo::tags($seo ?? []) ?>
-    <!-- Polices Google : Fraunces (titres, serif raffiné) + Inter (texte) -->
+    <!-- Police : Inter (une seule famille, du texte aux titres) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <?php $cssV = @filemtime(($_SERVER['DOCUMENT_ROOT'] ?? '') . '/assets/css/app.css'); ?>
     <link rel="stylesheet" href="/assets/css/app.css<?= $cssV ? '?v=' . $cssV : '' ?>">
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
 
+<!-- Barre utilitaire : coordonnées et horaires, comme sur un site d'entreprise. -->
+<div class="topbar">
+    <div class="container topbar-inner">
+        <a href="tel:+33556000000" class="topbar-item">☎ 05 56 00 00 00</a>
+        <span class="topbar-item">Lun–Ven 9h–18h · Sam 9h–13h</span>
+        <span class="topbar-item topbar-addr">1 rue du Spa, 33000 Bordeaux</span>
+    </div>
+</div>
+
 <header class="site-header">
     <div class="container header-inner">
-        <a href="/" class="brand"><?= View::e($appName) ?></a>
+        <a href="/" class="brand"><span class="brand-mark" aria-hidden="true">Z</span><?= View::e($appName) ?></a>
 
         <nav class="main-nav" aria-label="Navigation principale">
             <a href="/"<?= $navCurrent('/') ?>>Accueil</a>
@@ -56,17 +65,16 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
         <div class="auth-nav">
             <?php if ($user): ?>
                 <?php if ($user['role'] === 'client'): ?>
-                    <a href="/mon-compte">Mon compte</a>
+                    <a href="/mon-compte" class="nav-link-plain">Mon compte</a>
                 <?php endif; ?>
-                <span class="user-hello">Bonjour, <?= View::e($user['first_name']) ?></span>
                 <form action="/deconnexion" method="post" class="inline-form">
                     <?= Csrf::field() ?>
                     <button type="submit" class="btn btn-ghost btn-sm">Déconnexion</button>
                 </form>
             <?php else: ?>
-                <a href="/connexion" class="btn btn-ghost btn-sm">Connexion</a>
-                <a href="/inscription" class="btn btn-primary btn-sm">Créer un compte</a>
+                <a href="/connexion" class="nav-link-plain">Connexion</a>
             <?php endif; ?>
+            <a href="/prestations" class="btn btn-primary btn-sm">Réserver</a>
         </div>
     </div>
 </header>
@@ -119,9 +127,18 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
 
 <footer class="site-footer">
     <div class="container footer-inner">
+        <div class="footer-brand">
+            <span class="brand brand-footer"><span class="brand-mark" aria-hidden="true">Z</span><?= View::e($appName) ?></span>
+            <p>Institut de bien-être à Bordeaux. Massages, soins du visage, spa &amp; hammam, sur réservation.</p>
+            <a href="/prestations" class="btn btn-primary btn-sm">Prendre rendez-vous</a>
+        </div>
         <div>
-            <strong><?= View::e($appName) ?></strong>
-            <p>Institut de bien-être — 1 rue du Spa, 33000 Bordeaux</p>
+            <h2>Coordonnées</h2>
+            <ul class="footer-links">
+                <li>1 rue du Spa, 33000 Bordeaux</li>
+                <li><a href="tel:+33556000000">05 56 00 00 00</a></li>
+                <li><a href="/contact">Formulaire de contact</a></li>
+            </ul>
         </div>
         <div>
             <h2>Horaires</h2>

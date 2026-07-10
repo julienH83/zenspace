@@ -84,23 +84,28 @@ function initCatalogueFilters() {
             ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
-    // La carte entière est un lien (pas de bouton superflu).
+    // Carte de prestation : média + titre liés à la fiche, bouton « Réserver ».
     function cardHtml(s) {
+        const href = '/prestation/' + encodeURIComponent(s.slug);
         const price = Number(s.price).toFixed(2).replace('.', ',') + ' €';
         const webp = s.image ? s.image.replace(/\.(jpe?g|png)$/i, '.webp') : '';
         const media = s.image
-            ? `<div class="card-media"><picture><source srcset="/assets/images/${escapeHtml(webp)}" type="image/webp"><img src="/assets/images/${escapeHtml(s.image)}" alt="" loading="lazy" decoding="async"></picture></div>`
+            ? `<a class="card-media" href="${href}" tabindex="-1" aria-hidden="true"><picture><source srcset="/assets/images/${escapeHtml(webp)}" type="image/webp"><img src="/assets/images/${escapeHtml(s.image)}" alt="" loading="lazy" decoding="async"></picture></a>`
             : '';
         return `
-            <a class="card card-link" href="/prestation/${encodeURIComponent(s.slug)}">
+            <article class="card service-card">
                 ${media}
                 <div class="card-body">
                     <span class="tag">${escapeHtml(s.category_label)}</span>
-                    <h3>${escapeHtml(s.title)}</h3>
+                    <h3><a href="${href}">${escapeHtml(s.title)}</a></h3>
                     ${starsHtml(s.rating_avg, s.rating_count)}
-                    <p class="meta">${s.duration_min} min · <span class="price">${price}</span></p>
+                    <p class="meta">${s.duration_min} min</p>
+                    <div class="card-foot">
+                        <span class="price">${price}</span>
+                        <a class="btn btn-primary btn-sm" href="${href}">Réserver</a>
+                    </div>
                 </div>
-            </a>`;
+            </article>`;
     }
 
     function buildParams() {
