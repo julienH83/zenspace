@@ -33,15 +33,17 @@
    1. DESIGN TOKENS — palette neutre raffinée, un seul accent
    ===================================================================== */
 :root {
-    /* Palette principale */
+    /* Palette principale (identité conservée) */
     --bg: #FBFAF7;          /* ivoire (fond de page) */
     --surface: #FFFFFF;     /* surfaces (cartes, en-tête, pied) */
+    --surface-2: #F4F1EA;   /* surface alterne (bandes, fonds de section) */
     --text: #1C1C1A;        /* encre (texte principal) — ~15:1 sur ivoire */
     --muted: #6B6B63;       /* gris chaud (texte secondaire) — ~4.9:1 sur surface */
     --line: #E7E3DB;        /* filets / bordures discrètes */
     --accent: #3E5C4E;      /* vert sauge profond (liens, CTA) — blanc dessus ~6.5:1 */
     --accent-ink: #2C4438;  /* vert plus profond (survol) */
-    --gold: #9C7A3C;        /* doré : étoiles d'avis uniquement */
+    --accent-soft: #ECF1EE; /* tint vert très clair (pastilles, fonds d'icônes) */
+    --gold: #9C7A3C;        /* doré : étoiles d'avis */
 
     /* Alias de rétrocompatibilité — certains styles inline des vues
        référencent encore ces anciens noms de variables. */
@@ -55,8 +57,33 @@
     --font-display: "Fraunces", Georgia, serif;
     --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-    /* Géométrie & largeur de contenu */
-    --radius: 8px;
+    /* Échelle d'espacement — rythme vertical/horizontal cohérent */
+    --space-1: .25rem;
+    --space-2: .5rem;
+    --space-3: .75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --space-8: 4.5rem;
+
+    /* Rayons */
+    --radius: 10px;         /* rayon de base (cartes, champs, boutons) */
+    --radius-sm: 6px;
+    --radius-lg: 18px;
+    --radius-pill: 999px;
+
+    /* Élévation — système d'ombres douces (profondeur discrète) */
+    --shadow-sm: 0 1px 2px rgba(28, 28, 26, .05), 0 1px 3px rgba(28, 28, 26, .05);
+    --shadow-md: 0 6px 20px rgba(28, 28, 26, .09);
+    --shadow-lg: 0 18px 44px rgba(28, 28, 26, .13);
+
+    /* Mouvement — durées + courbe d'accélération partagées */
+    --dur-fast: .15s;
+    --dur: .22s;
+    --ease: cubic-bezier(.22, .61, .36, 1);
+
+    /* Largeur de contenu */
     --maxw: 1120px;
 }
 
@@ -170,9 +197,14 @@ button:focus-visible,
    ===================================================================== */
 .site-header {
     position: sticky; top: 0; z-index: 50;
-    background: var(--surface);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    -webkit-backdrop-filter: saturate(1.4) blur(8px);
+    backdrop-filter: saturate(1.4) blur(8px);
     border-bottom: 1px solid var(--line);
+    transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
+/* Ombre discrète une fois la page défilée (classe posée par app.js). */
+.site-header.is-scrolled { box-shadow: var(--shadow-sm); border-color: transparent; }
 .header-inner {
     display: flex; align-items: center; gap: 1.5rem;
     padding-top: 1rem; padding-bottom: 1rem;
@@ -201,20 +233,33 @@ button:focus-visible,
    6. HÉROS — pleine largeur (full-bleed), photo de fond fournie inline
    ===================================================================== */
 .hero {
+    position: relative;
     width: 100vw;
     margin-inline: calc(50% - 50vw);
-    min-height: 72vh;
+    min-height: 74vh;
     display: flex; align-items: flex-end;
     background-size: cover;
     background-position: center;
     color: #fff;
+    isolation: isolate;
+}
+/* Voile sombre dégradé : lisibilité du texte quelle que soit la photo. */
+.hero::before {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(20, 30, 26, .22) 0%, rgba(20, 30, 26, .40) 55%, rgba(20, 30, 26, .66) 100%);
 }
 .hero-inner {
     max-width: var(--maxw);
     margin-inline: auto;
     width: 100%;
-    padding: 0 1.25rem 4rem;
+    padding: 0 1.25rem 4.5rem;
 }
+.hero-actions { display: flex; flex-wrap: wrap; gap: .8rem; align-items: center; }
+.hero .btn-ghost {
+    background: rgba(255, 255, 255, .1); color: #fff; border-color: rgba(255, 255, 255, .5);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+.hero .btn-ghost:hover { background: rgba(255, 255, 255, .18); border-color: #fff; }
 .hero-kicker {
     text-transform: uppercase; letter-spacing: .18em;
     font-size: .8rem; font-weight: 600; opacity: .9; margin: 0;
@@ -260,28 +305,45 @@ button:focus-visible,
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 2.5rem; align-items: center;
 }
-.media-row img { width: 100%; border-radius: var(--radius); display: block; }
+.media-row picture { display: block; }
+.media-row img {
+    width: 100%; aspect-ratio: 3 / 2; object-fit: cover;
+    border-radius: var(--radius); display: block; box-shadow: var(--shadow-sm);
+}
 .media-text h2 { margin-top: 0; }
 
 /* =====================================================================
    8. BOUTONS — sobres, coins légèrement arrondis (pas de pilule)
    ===================================================================== */
 .btn {
-    display: inline-flex; align-items: center; gap: .5rem;
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
     font: 600 .98rem var(--font-body);
-    padding: .7rem 1.4rem;
+    padding: .72rem 1.45rem;
     border-radius: var(--radius);
     border: 1px solid transparent;
     text-decoration: none; cursor: pointer;
-    transition: background .15s ease, color .15s ease, border-color .15s ease;
+    transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+                border-color var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease),
+                transform var(--dur-fast) var(--ease);
 }
-.btn-primary,
-.btn-accent { background: var(--accent); color: #fff; }
-.btn-primary:hover,
-.btn-accent:hover { background: var(--accent-ink); color: #fff; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
 
-.btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
-.btn-ghost:hover { border-color: var(--text); }
+.btn-primary,
+.btn-accent { background: var(--accent); color: #fff; box-shadow: var(--shadow-sm); }
+.btn-primary:hover,
+.btn-accent:hover { background: var(--accent-ink); color: #fff; box-shadow: var(--shadow-md); }
+
+.btn-ghost { background: var(--surface); color: var(--text); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--text); box-shadow: var(--shadow-sm); }
+
+/* Action destructive (désactiver / supprimer dans l'espace gestion). */
+.btn-danger { background: transparent; color: #8f2f2f; border-color: #e0bcbc; }
+.btn-danger:hover { background: #fbf2f2; border-color: #b45c5c; color: #7a2626; }
+
+.btn:disabled, .btn[aria-disabled="true"] {
+    opacity: .55; cursor: not-allowed; transform: none; box-shadow: none;
+}
 
 .btn-sm { padding: .45rem .9rem; font-size: .88rem; }
 .btn-block { width: 100%; justify-content: center; }
@@ -316,22 +378,34 @@ button:focus-visible,
     border-radius: var(--radius);
     overflow: hidden;
     display: flex; flex-direction: column;
+    box-shadow: var(--shadow-sm);
 }
 .card-link {
     text-decoration: none; color: inherit;
-    transition: border-color .15s ease, box-shadow .15s ease;
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+                transform var(--dur) var(--ease);
 }
 .card-link:hover {
-    border-color: var(--accent);
-    box-shadow: 0 8px 24px rgba(28, 28, 26, .08);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
 }
 
-.card-media { aspect-ratio: 4 / 3; }
-.card-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card-media { aspect-ratio: 4 / 3; overflow: hidden; }
+.card-media img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform .5s var(--ease);
+}
+.card-link:hover .card-media img { transform: scale(1.04); }
 
 .card-body { padding: 1.1rem 1.2rem 1.3rem; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
 .card h3 { font-family: var(--font-display); font-size: 1.25rem; margin: .3rem 0; }
 .card .btn { margin-top: auto; }
+
+/* Note en étoiles sur les cartes (données maintenues par trigger SQL). */
+.card-rating { display: flex; align-items: center; gap: .4rem; font-size: .9rem; }
+.card-rating .stars { color: var(--gold); letter-spacing: .06em; }
+.card-rating .rating-count { color: var(--muted); font-size: .82rem; }
 
 .tag {
     display: inline-block; align-self: flex-start;
@@ -515,6 +589,8 @@ table.data, .data { width: 100%; border-collapse: collapse; }
 .site-footer a { color: var(--accent); }
 .hours { list-style: none; padding: 0; margin: 0; color: var(--muted); }
 .hours li { padding: .15rem 0; font-size: .95rem; }
+.footer-links { list-style: none; padding: 0; margin: 0; }
+.footer-links li { padding: .15rem 0; font-size: .95rem; }
 .footer-bottom {
     text-align: center; margin-top: 2rem;
     padding-top: 1.2rem; border-top: 1px solid var(--line);
@@ -552,4 +628,138 @@ table.data, .data { width: 100%; border-collapse: collapse; }
 
 @media (max-width: 768px) {
     .footer-inner { grid-template-columns: 1fr; }
+}
+
+/* =====================================================================
+   20. COMPOSANTS ENRICHIS — apparition au défilement, sections d'accueil,
+       icônes, panneau fidélité. (Ajouts « élévation » de la refonte.)
+   ===================================================================== */
+
+/* --- Apparition douce au défilement -------------------------------- */
+/* Robuste : l'état masqué n'est appliqué QUE si JavaScript est actif
+   (classe .js posée sur <html> par app.js). Sans JS, le contenu reste
+   parfaitement visible. Neutralisé si l'utilisateur préfère moins d'animations. */
+.js .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .6s var(--ease), transform .6s var(--ease);
+    will-change: opacity, transform;
+}
+.js .reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+    .js .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* --- Icônes inline (SVG, sans dépendance externe) ------------------ */
+.icon { width: 1.5rem; height: 1.5rem; display: inline-block; vertical-align: middle; }
+.icon-lg { width: 2rem; height: 2rem; }
+
+/* --- Bande de section à fond alterné (full-bleed) ------------------ */
+.band {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    background: var(--surface-2);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+.band > .container { padding-block: var(--space-8); }
+
+/* --- « Nos engagements » : trois atouts avec pastille d'icône ------ */
+.features {
+    display: grid; gap: var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.feature {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.feature:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.feature-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 3rem; height: 3rem; border-radius: var(--radius-pill);
+    background: var(--accent-soft); color: var(--accent);
+    margin-bottom: var(--space-4);
+}
+.feature h3 { margin: 0 0 var(--space-2); }
+.feature p { margin: 0; color: var(--muted); }
+
+/* --- « Comment ça se passe » : étapes numérotées ------------------- */
+.steps {
+    display: grid; gap: var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    counter-reset: step;
+}
+.step { position: relative; padding-left: 3.4rem; }
+.step-num {
+    position: absolute; left: 0; top: 0;
+    width: 2.5rem; height: 2.5rem; border-radius: var(--radius-pill);
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--accent); color: #fff;
+    font-family: var(--font-display); font-weight: 600; font-size: 1.1rem;
+    box-shadow: var(--shadow-sm);
+}
+.step h3 { margin: .2rem 0 var(--space-2); font-size: 1.2rem; }
+.step p { margin: 0; color: var(--muted); }
+
+/* --- Bande d'appel à l'action (avant le pied de page) ------------- */
+.cta-band {
+    width: 100vw; margin-inline: calc(50% - 50vw);
+    background: var(--accent); color: #fff;
+    text-align: center;
+}
+.cta-band > .container { padding-block: var(--space-8); }
+.cta-band h2 { color: #fff; margin-top: 0; }
+.cta-band p { color: rgba(255, 255, 255, .9); max-width: 46ch; margin-inline: auto; }
+.cta-band .btn-primary { background: #fff; color: var(--accent-ink); }
+.cta-band .btn-primary:hover { background: #f2efe8; color: var(--accent-ink); }
+
+/* --- Teaser magazine : petite carte article ----------------------- */
+.article-card .card-body { gap: var(--space-2); }
+.article-card time { color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .08em; }
+
+/* --- Panneau fidélité (Mon compte) -------------------------------- */
+.loyalty-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+.loyalty-panel-head {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: var(--space-5); flex-wrap: wrap;
+}
+.loyalty-heading { margin: 0 0 var(--space-2); }
+.loyalty-panel .muted { margin: 0; }
+
+.loyalty-badge {
+    display: inline-flex; flex-direction: column; align-items: center;
+    padding: var(--space-4) var(--space-5); border-radius: var(--radius);
+    border: 1px solid var(--line); background: var(--accent-soft); min-width: 9rem;
+}
+.loyalty-points { font-family: var(--font-display); font-size: 1.6rem; color: var(--accent-ink); }
+.loyalty-points strong { font-weight: 600; }
+.loyalty-tier { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.loyalty-bronze { background: #f3ece2; border-color: #e2d3bf; }
+.loyalty-silver { background: #eef0f1; border-color: #d3d8db; }
+.loyalty-gold   { background: #f7efd9; border-color: #e6d29a; }
+.loyalty-gold .loyalty-points { color: #7a5b1e; }
+
+.loyalty-history { list-style: none; margin: var(--space-5) 0 0; padding: var(--space-5) 0 0; border-top: 1px solid var(--line); }
+.loyalty-history li { display: flex; align-items: baseline; gap: var(--space-4); padding: .3rem 0; }
+.loyalty-delta { font-weight: 700; min-width: 3.2rem; }
+.loyalty-delta.is-gain { color: var(--accent); }
+.loyalty-delta.is-spend { color: #8f2f2f; }
+.loyalty-reason { flex: 1; }
+.loyalty-date { font-size: .85rem; }
+
+/* --- Responsive des nouveaux composants --------------------------- */
+@media (max-width: 768px) {
+    .loyalty-panel-head { flex-direction: column; align-items: flex-start; }
+    .hero { min-height: 66vh; }
 }

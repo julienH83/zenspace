@@ -25,6 +25,10 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?php // Marque « JS actif » au plus tôt : évite tout clignotement des sections
+          // à apparition différée. Sans JS, la classe n'est jamais posée et tout
+          // le contenu reste visible (amélioration progressive). ?>
+    <script>document.documentElement.classList.add('js');</script>
     <?= Seo::tags($seo ?? []) ?>
     <!-- Polices Google : Fraunces (titres, serif raffiné) + Inter (texte) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -97,6 +101,7 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
                     <a href="/admin/prestations"<?= $navSection('/admin/prestations') ?>>Prestations</a>
                     <a href="/admin/reservations"<?= $navSection('/admin/reservations') ?>>Réservations</a>
                     <a href="/admin/avis"<?= $navSection('/admin/avis') ?>>Avis</a>
+                    <a href="/admin/magazine"<?= $navSection('/admin/magazine') ?>>Magazine</a>
                     <?php if ($user && $user['role'] === 'admin'): ?>
                         <a href="/admin/employes"<?= $navSection('/admin/employes') ?>>Employés</a>
                         <a href="/admin/statistiques"<?= $navSection('/admin/statistiques') ?>>Statistiques</a>
@@ -126,10 +131,14 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
                 <li>Dimanche : fermé</li>
             </ul>
         </div>
-        <div>
-            <h2>Informations</h2>
-            <a href="/contact">Nous contacter</a>
-        </div>
+        <nav aria-label="Liens de bas de page">
+            <h2>Explorer</h2>
+            <ul class="footer-links">
+                <li><a href="/prestations">Nos prestations</a></li>
+                <li><a href="/magazine">Magazine bien-être</a></li>
+                <li><a href="/contact">Nous contacter</a></li>
+            </ul>
+        </nav>
     </div>
     <div class="footer-bottom">
         <small>© <?= date('Y') ?> <?= View::e($appName) ?> — Tous droits réservés. Projet DWWM.</small>

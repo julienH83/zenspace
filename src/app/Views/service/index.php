@@ -46,13 +46,12 @@ $fMaxDuration = (int) ($filters['max_duration'] ?? 0) ?: 120;
             <?php foreach ($services as $s): ?>
                 <a class="card card-link" href="/prestation/<?= e($s['slug']) ?>">
                     <?php if (!empty($s['image'])): ?>
-                        <div class="card-media">
-                            <img src="/assets/images/<?= e($s['image']) ?>" alt="" loading="lazy">
-                        </div>
+                        <div class="card-media"><?= picture($s['image'], '') ?></div>
                     <?php endif; ?>
                     <div class="card-body">
                         <span class="tag"><?= e($s['category_label']) ?></span>
                         <h3><?= e($s['title']) ?></h3>
+                        <?= stars($s['rating_avg'] ?? 0, $s['rating_count'] ?? 0) ?>
                         <p class="meta"><?= (int) $s['duration_min'] ?> min · <span class="price"><?= price($s['price']) ?></span></p>
                     </div>
                 </a>
