@@ -2,32 +2,26 @@
 /** @var array $services @var array $reviews @var array $articles */
 include __DIR__ . '/../partials/icons.php';
 ?>
-<!-- Héros premium à deux colonnes : discours + CTA à gauche, photo habillée à droite. -->
-<section class="hero">
-    <span class="hero-glow" aria-hidden="true"></span>
-    <div class="container hero-grid">
-        <div class="hero-content">
-            <p class="hero-kicker"><span class="kicker-dot" aria-hidden="true"></span>Institut de bien-être · Bordeaux</p>
-            <h1>Réservez votre <span class="hl">soin bien-être</span> en quelques clics</h1>
-            <p class="hero-lede">Massages, soins du visage, spa &amp; hammam. Choisissez votre prestation,
-               votre créneau, et laissez-vous porter.</p>
-            <div class="hero-actions">
-                <a href="/prestations" class="btn btn-primary">Voir les prestations</a>
-                <a href="/contact" class="btn btn-ghost">Nous contacter</a>
-            </div>
-            <ul class="hero-points">
-                <li>Praticiens diplômés</li>
-                <li>Réservation en ligne</li>
-                <li>Points de fidélité</li>
-            </ul>
+<!-- Héros dramatique plein cadre : grande photo voilée, titre serif, détails or. -->
+<section class="hero"
+         style="background-image: url('/assets/images/hero-spa.jpg');
+                background-image: -webkit-image-set(url('/assets/images/hero-spa.webp') type('image/webp'), url('/assets/images/hero-spa.jpg') type('image/jpeg'));
+                background-image: image-set(url('/assets/images/hero-spa.webp') type('image/webp'), url('/assets/images/hero-spa.jpg') type('image/jpeg'));">
+    <div class="hero-inner">
+        <span class="hero-rule" aria-hidden="true"></span>
+        <p class="hero-eyebrow">Institut de bien-être · Bordeaux</p>
+        <h1>L'art de <span class="gold">prendre soin</span> de vous</h1>
+        <p class="hero-lede">Massages, soins du visage, spa &amp; hammam. Réservez votre parenthèse
+           d'exception en quelques clics.</p>
+        <div class="hero-actions">
+            <a href="/prestations" class="btn btn-primary">Réserver un soin</a>
+            <a href="/prestations" class="btn btn-ghost">Découvrir la carte</a>
         </div>
-        <div class="hero-media">
-            <?= picture('hero-spa.jpg', 'Ambiance apaisante de l\'institut ZenSpace', 'eager') ?>
-            <div class="hero-chip">
-                <span class="stars" aria-hidden="true">★★★★★</span>
-                <span><strong>4,9/5</strong> · avis clients</span>
-            </div>
-        </div>
+        <ul class="hero-points">
+            <li>Praticiens diplômés</li>
+            <li>Sur rendez-vous</li>
+            <li>Points de fidélité</li>
+        </ul>
     </div>
 </section>
 

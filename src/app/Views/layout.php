@@ -26,10 +26,10 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Seo::tags($seo ?? []) ?>
-    <!-- Police : Inter (une seule famille, du texte aux titres) -->
+    <!-- Polices : Cormorant Garamond (titres, serif de luxe) + Inter (interface/texte) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <?php $cssV = @filemtime(($_SERVER['DOCUMENT_ROOT'] ?? '') . '/assets/css/app.css'); ?>
     <link rel="stylesheet" href="/assets/css/app.css<?= $cssV ? '?v=' . $cssV : '' ?>">
 </head>
