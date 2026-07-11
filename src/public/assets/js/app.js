@@ -8,10 +8,47 @@
    ===================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    initNav();
     initReveal();
     initHeaderScroll();
     initCatalogueFilters();
 });
+
+/* --- 0. Menu mobile (hamburger) ----------------------------------- */
+function initNav() {
+    const toggle = document.getElementById('nav-toggle');
+    const panel = document.getElementById('primary-nav');
+    if (!toggle || !panel) return;
+
+    // Signale que le JS gère le menu : le CSS ne replie le menu QUE dans ce cas
+    // (sans JS, la navigation reste visible et accessible).
+    document.documentElement.classList.add('js-nav');
+
+    const close = () => {
+        panel.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Ouvrir le menu');
+    };
+    const open = () => {
+        panel.classList.add('is-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.setAttribute('aria-label', 'Fermer le menu');
+    };
+
+    toggle.addEventListener('click', () => {
+        panel.classList.contains('is-open') ? close() : open();
+    });
+    // Fermer après un clic sur un lien du menu.
+    panel.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
+    // Fermer avec la touche Échap.
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    // Fermer en cliquant en dehors du menu.
+    document.addEventListener('click', (e) => {
+        if (panel.classList.contains('is-open') && !panel.contains(e.target) && !toggle.contains(e.target)) close();
+    });
+    // Repli propre si l'on repasse en affichage large.
+    window.addEventListener('resize', () => { if (window.innerWidth > 820) close(); });
+}
 
 /* --- 1. Apparition au défilement ---------------------------------- */
 function initReveal() {

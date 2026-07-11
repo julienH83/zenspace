@@ -49,28 +49,37 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
     <div class="container header-inner">
         <a href="/" class="brand"><span class="brand-mark" aria-hidden="true">Z</span><?= View::e($appName) ?></a>
 
-        <nav class="main-nav" aria-label="Navigation principale">
-            <a href="/"<?= $navCurrent('/') ?>>Accueil</a>
-            <a href="/prestations"<?= $navCurrent('/prestations') ?>>Prestations</a>
-            <a href="/contact"<?= $navCurrent('/contact') ?>>Contact</a>
-            <?php if ($user && in_array($user['role'], ['employe', 'admin'], true)): ?>
-                <a href="/admin"<?= $navCurrent('/admin') ?>>Espace gestion</a>
-            <?php endif; ?>
-        </nav>
-
-        <div class="auth-nav">
-            <?php if ($user): ?>
-                <?php if ($user['role'] === 'client'): ?>
-                    <a href="/mon-compte" class="nav-link-plain">Mon compte</a>
+        <?php // Bloc replié en menu hamburger sur mobile (voir app.js / .nav-collapse). ?>
+        <div class="nav-collapse" id="primary-nav">
+            <nav class="main-nav" aria-label="Navigation principale">
+                <a href="/"<?= $navCurrent('/') ?>>Accueil</a>
+                <a href="/prestations"<?= $navCurrent('/prestations') ?>>Prestations</a>
+                <a href="/contact"<?= $navCurrent('/contact') ?>>Contact</a>
+                <?php if ($user && in_array($user['role'], ['employe', 'admin'], true)): ?>
+                    <a href="/admin"<?= $navCurrent('/admin') ?>>Espace gestion</a>
                 <?php endif; ?>
-                <form action="/deconnexion" method="post" class="inline-form">
-                    <?= Csrf::field() ?>
-                    <button type="submit" class="btn btn-ghost btn-sm">Déconnexion</button>
-                </form>
-            <?php else: ?>
-                <a href="/connexion" class="nav-link-plain">Connexion</a>
-            <?php endif; ?>
+            </nav>
+            <div class="auth-links">
+                <?php if ($user): ?>
+                    <?php if ($user['role'] === 'client'): ?>
+                        <a href="/mon-compte" class="nav-link-plain">Mon compte</a>
+                    <?php endif; ?>
+                    <form action="/deconnexion" method="post" class="inline-form">
+                        <?= Csrf::field() ?>
+                        <button type="submit" class="btn btn-ghost btn-sm">Déconnexion</button>
+                    </form>
+                <?php else: ?>
+                    <a href="/connexion" class="nav-link-plain">Connexion</a>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="header-actions">
             <a href="/prestations" class="btn btn-primary btn-sm">Réserver</a>
+            <button type="button" class="nav-toggle" id="nav-toggle"
+                    aria-controls="primary-nav" aria-expanded="false" aria-label="Ouvrir le menu">
+                <span class="nav-toggle-box" aria-hidden="true"><span class="nav-toggle-bar"></span></span>
+            </button>
         </div>
     </div>
 </header>
