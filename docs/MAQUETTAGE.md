@@ -20,11 +20,12 @@ Sommaire :
 le calme et la confiance, tout en restant un **site de services** clair et
 orienté **réservation** (et non une revue éditoriale).
 
-**Parti pris visuel** : site de services moderne — typographie sans-serif unique
-(Inter), titres compacts, mise en page structurée et dense, marque affirmée
-(barre utilitaire, pastille de marque, bouton « Réserver » toujours visible),
-accent vert sauge, pied de page sombre. La profondeur (ombres douces,
-micro-animations d'apparition) reste discrète.
+**Parti pris visuel** : **spa de luxe sombre & or** — thème sombre (vert-nuit),
+accent doré, grande typographie **serif** (Cormorant Garamond) pour les titres et
+sans-serif (Inter) pour l'interface. Héros dramatique plein cadre, détails dorés
+(filets, puces, badges de prix), marque affirmée (barre utilitaire, pastille de
+marque, bouton « Réserver » toujours visible). Ambiance boutique-hôtel haut de
+gamme, orientée réservation — l'opposé d'un template générique.
 
 **Contraintes** :
 - **Mobile-first** : conception pensée d'abord pour le téléphone, puis élargie.
@@ -46,31 +47,30 @@ micro-animations d'apparition) reste discrète.
 
 | Rôle | Nom | Hex | Usage | Contraste |
 |---|---|---|---|---|
-| Fond | Ivoire | `#FBFAF7` | Fond de page | — |
-| Surface | Blanc | `#FFFFFF` | Cartes, en-tête, pied | — |
-| Surface alt. | Sable | `#F4F1EA` | Bandes de section | — |
-| Texte | Encre | `#1C1C1A` | Texte principal | ~15:1 sur ivoire ✅ |
-| Texte secondaire | Gris chaud | `#6B6B63` | Légendes, méta | ~4.9:1 sur surface ✅ |
-| Filet | Lin | `#E7E3DB` | Bordures discrètes | — |
-| Accent | Vert sauge | `#3E5C4E` | Liens, boutons, CTA | blanc dessus ~6.5:1 ✅ |
-| Accent foncé | Vert profond | `#2C4438` | Survols | ✅ |
-| Accent clair | Vert brume | `#ECF1EE` | Pastilles d'icônes, fonds doux | — |
-| Doré | Or | `#9C7A3C` | Étoiles d'avis uniquement | — |
+| Fond | Vert-nuit | `#0F1713` | Fond de page | — |
+| Surface | Sombre | `#16221B` | En-tête, cartes | — |
+| Surface alt. | Sombre surélevé | `#1C2C23` | Bandes de section | — |
+| Texte | Crème | `#ECE6D8` | Texte principal | ~13:1 sur le fond ✅ |
+| Texte secondaire | Sauge grisé | `#9DA99F` | Légendes, méta | ~5:1 sur le fond ✅ |
+| Filet | Crème 13 % | `rgba(236,230,216,.13)` | Bordures discrètes | — |
+| Accent | Or | `#C9A227` | Liens, boutons, détails | ~7:1 sur le fond ✅ |
+| Accent foncé | Or profond | `#A9861A` | Survols, dégradés | — |
+| Sur l'or | Encre | `#14201A` | Texte posé SUR l'or (boutons) | ~8:1 sur l'or ✅ |
 
-Tous les couples texte/fond visés respectent WCAG AA (≥ 4.5:1 pour le texte
-courant). L'accent est utilisé avec parcimonie : la couleur signale l'action.
+Thème sombre : texte crème sur fond vert-nuit (fort contraste). L'or signale
+l'action et les détails de luxe ; le texte posé sur l'or est en encre foncée
+(jamais blanc) pour respecter WCAG AA.
 
 ### 2.2 Typographie
 
 | Usage | Police | Graisses | Remarque |
 |---|---|---|---|
-| Titres | **Inter** | 700 / 800 | Compacts, `letter-spacing` négatif |
-| Texte courant | **Inter** | 400–600 | Lisibilité écran |
+| Titres | **Cormorant Garamond** (serif) | 500 / 600 | Grand, élégant, « luxe » |
+| Interface / texte | **Inter** (sans-serif) | 400–700 | Lisibilité écran, UI |
 
-Une seule famille (Inter) du texte aux titres : cohérent avec un site de
-services (et non une revue). Échelle de titres fluide via `clamp()` :
-`h1` ~1.9 → 2.5 rem · `h2` ~1.5 → 2 rem · `h3` 1.2 rem. Corps de texte 1 rem,
-interligne 1.6.
+Contraste fort entre un serif de luxe (titres, immenses) et un sans-serif net
+(interface). Échelle de titres fluide via `clamp()` : `h1` ~2.6 → 4.2 rem
+(héros jusqu'à ~5 rem) · `h2` ~2 → 3 rem · `h3` 1.45 rem. Corps 1 rem, interligne 1.6.
 
 ### 2.3 Échelle d'espacement & géométrie (design tokens)
 
@@ -84,8 +84,8 @@ interligne 1.6.
 - **Icônes** : jeu SVG *inline* (aucune dépendance externe), trait fin 1.6,
   `currentColor` (héritent la couleur du texte). Cf. `Views/partials/icons.php`.
 - **Logo / wordmark** : une pastille carrée à coins arrondis portant l'initiale
-  « Z » (fond vert accent) accolée au nom « ZenSpace » en Inter 800 — repère de
-  marque simple, présent en en-tête et en pied de page.
+  « Z » (fond **or**, encre foncée) accolée au nom « ZenSpace » en serif — repère
+  de marque simple, présent en en-tête et en pied de page.
 
 ### 2.5 Inventaire des composants
 
