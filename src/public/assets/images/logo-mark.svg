@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Logo ZenSpace — monogramme circulaire (sceau de boutique).
+
+    Direction : institut de bien-être haut de gamme.
+    Références visuelles : sceaux de cire, boutiques-hôtels de luxe (Aman,
+    Le Bristol), gastronomie étoilée. L'or signale l'excellence ;
+    le trait fin et l'italique serif signalent la délicatesse.
+
+    Construit intégralement en <path> — indépendant de toute police,
+    net à toute taille (jusqu'au favicon 16×16 comme jusqu'à une bannière).
+    `currentColor` : la couleur est héritée du texte du conteneur, donc
+    le même fichier fonctionne en or, en crème, ou en toute autre teinte.
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 64 64"
+     fill="none"
+     role="img"
+     aria-label="ZenSpace">
+    <!-- Anneau extérieur : filet principal du sceau -->
+    <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="1.6"/>
+
+    <!-- Anneau intérieur : double filet caractéristique des sceaux typographiques -->
+    <circle cx="32" cy="32" r="26.5" stroke="currentColor" stroke-width="0.7" opacity="0.55"/>
+
+    <!-- Étoile à quatre branches en haut (ornement typographique classique) -->
+    <path d="M32 8.5 L32.9 11.4 L35.8 12.3 L32.9 13.2 L32 16.1 L31.1 13.2 L28.2 12.3 L31.1 11.4 Z"
+          fill="currentColor"/>
+
+    <!-- Filets ornementaux gauche et droite (équilibrent le sceau) -->
+    <path d="M11.5 32 h3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+    <path d="M49.3 32 h3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+
+    <!--
+        Monogramme "Z" serif italique, dessiné en chemins vectoriels.
+        Proportions inspirées d'une romaine classique (contraste plein/délié
+        marqué, empattements horizontaux), légère inclinaison à 8° pour
+        l'italique. Les trois traits sont fermés en polygones pour garder
+        des empattements nets à toute échelle.
+    -->
+    <g fill="currentColor" transform="translate(32 34) rotate(-8) translate(-32 -34)">
+        <!-- Trait supérieur : empattement gauche léger, empattement droit accentué -->
+        <path d="M20.5 22
+                 L44 22
+                 L44 24.4
+                 L42.6 24.4
+                 L42.6 23.3
+                 L22.4 23.3
+                 L22.4 24.4
+                 L20.5 24.4 Z"/>
+
+        <!-- Diagonale : plein central, s'affine légèrement aux extrémités -->
+        <path d="M41.2 23.3
+                 L44 23.3
+                 L26.4 44.7
+                 L23 44.7 Z"/>
+
+        <!-- Trait inférieur : empattement gauche accentué, empattement droit léger -->
+        <path d="M20 43.6
+                 L21.4 43.6
+                 L21.4 44.7
+                 L41.6 44.7
+                 L41.6 43.6
+                 L43.5 43.6
+                 L43.5 46
+                 L20 46 Z"/>
+    </g>
+</svg>

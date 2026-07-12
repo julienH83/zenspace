@@ -23,6 +23,10 @@ if (!function_exists('icon')) {
             'heart'    => '<path d="M12 20s-7-4.5-9.2-9A4.8 4.8 0 0 1 12 6a4.8 4.8 0 0 1 9.2 5C19 15.5 12 20 12 20Z"/>',
             // Horaires souples
             'clock'    => '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+            // Contact téléphonique
+            'phone'    => '<path d="M4.5 4.5A2 2 0 0 1 6.5 2.5h1.8a1.5 1.5 0 0 1 1.45 1.11l.8 3a1.5 1.5 0 0 1-.42 1.5L9 9.2a12 12 0 0 0 5.8 5.8l1.09-1.12a1.5 1.5 0 0 1 1.5-.42l3 .8A1.5 1.5 0 0 1 21.5 15.7v1.8a2 2 0 0 1-2 2A16 16 0 0 1 4.5 4.5Z"/>',
+            // Localisation / adresse
+            'pin'      => '<path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.7"/>',
         ];
         $inner = $paths[$name] ?? $paths['sparkle'];
         return '<svg class="' . e($class) . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" '

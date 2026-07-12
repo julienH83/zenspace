@@ -9,6 +9,9 @@
  *
  * @var array $s
  */
+// Chargement de icon() si la vue appelante ne l'a pas déjà inclus (catalogue,
+// API JSON de filtrage). include_once → aucun coût si déjà chargé.
+include_once __DIR__ . '/icons.php';
 $slug = '/prestation/' . e($s['slug']);
 ?>
 <article class="card service-card">
@@ -22,7 +25,7 @@ $slug = '/prestation/' . e($s['slug']);
         <span class="tag-chip"><?= e($s['category_label']) ?></span>
         <h3><a href="<?= $slug ?>"><?= e($s['title']) ?></a></h3>
         <?= stars($s['rating_avg'] ?? 0, $s['rating_count'] ?? 0) ?>
-        <p class="meta meta-duration"><?= (int) $s['duration_min'] ?> min</p>
+        <p class="meta meta-duration"><?= icon('clock', 'icon-inline') ?><span><?= (int) $s['duration_min'] ?>&nbsp;min</span></p>
         <a class="btn btn-primary btn-sm card-cta" href="<?= $slug ?>">Réserver ce soin</a>
     </div>
 </article>

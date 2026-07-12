@@ -12,6 +12,9 @@ use App\Core\Flash;
 use App\Core\Seo;
 use App\Core\View;
 
+// Icônes SVG utilisées dans le layout (barre utilitaire).
+include_once __DIR__ . '/partials/icons.php';
+
 $user      = Auth::user();
 $isAdminUi = $layout_admin ?? false;
 $appName   = $_ENV['APP_NAME'] ?? 'ZenSpace';
@@ -25,6 +28,7 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo-mark.svg">
     <?= Seo::tags($seo ?? []) ?>
     <!-- Polices : Cormorant Garamond (titres, serif de luxe) + Inter (interface/texte) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,15 +43,21 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
 <!-- Barre utilitaire : coordonnées et horaires, comme sur un site d'entreprise. -->
 <div class="topbar">
     <div class="container topbar-inner">
-        <a href="tel:+33556000000" class="topbar-item">☎ 05 56 00 00 00</a>
-        <span class="topbar-item">Lun–Ven 9h–18h · Sam 9h–13h</span>
-        <span class="topbar-item topbar-addr">1 rue du Spa, 33000 Bordeaux</span>
+        <a href="tel:+33556000000" class="topbar-item">
+            <?= icon('phone', 'icon-inline') ?><span>05&nbsp;56&nbsp;00&nbsp;00&nbsp;00</span>
+        </a>
+        <span class="topbar-item">
+            <?= icon('clock', 'icon-inline') ?><span>Lun–Ven 9h–18h · Sam 9h–13h</span>
+        </span>
+        <span class="topbar-item topbar-addr">
+            <?= icon('pin', 'icon-inline') ?><span>1 rue du Spa, 33000 Bordeaux</span>
+        </span>
     </div>
 </div>
 
 <header class="site-header">
     <div class="container header-inner">
-        <a href="/" class="brand"><span class="brand-mark" aria-hidden="true">Z</span><?= View::e($appName) ?></a>
+        <a href="/" class="brand"><?php include __DIR__ . '/partials/brand_mark.php'; ?><?= View::e($appName) ?></a>
 
         <?php // Bloc replié en menu hamburger sur mobile (voir app.js / .nav-collapse). ?>
         <div class="nav-collapse" id="primary-nav">
@@ -133,7 +143,7 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
 <footer class="site-footer">
     <div class="container footer-inner">
         <div class="footer-brand">
-            <span class="brand brand-footer"><span class="brand-mark" aria-hidden="true">Z</span><?= View::e($appName) ?></span>
+            <span class="brand brand-footer"><?php include __DIR__ . '/partials/brand_mark.php'; ?><?= View::e($appName) ?></span>
             <p>Institut de bien-être à Bordeaux. Massages, soins du visage, spa &amp; hammam, sur réservation.</p>
             <a href="/prestations" class="btn btn-primary btn-sm">Prendre rendez-vous</a>
         </div>

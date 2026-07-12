@@ -57,13 +57,9 @@ $loggedIn     = Auth::check();
 
     <?php if ($deroule !== null): ?>
         <h2>Comment se déroule le soin&nbsp;?</h2>
-        <ol class="deroule" style="margin:0 0 1rem;padding-left:0;list-style:none;counter-reset:etape;">
+        <ol class="deroule">
             <?php foreach ($deroule as $etape): ?>
-                <li style="position:relative;padding:.55rem 0 .55rem 2.4rem;counter-increment:etape;border-bottom:1px solid var(--mist-100,#EFEAE2);">
-                    <span aria-hidden="true" style="position:absolute;left:0;top:.5rem;width:1.7rem;height:1.7rem;border-radius:999px;background:var(--cta-bg,#9A5B3B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;">
-                        <?= $loop_i = ($loop_i ?? 0) + 1 ?>
-                    </span><?= e($etape) ?>
-                </li>
+                <li><?= e($etape) ?></li>
             <?php endforeach; ?>
         </ol>
     <?php endif; ?>
@@ -84,19 +80,6 @@ $loggedIn     = Auth::check();
          passés sont désactivés.
          ===================================================================== -->
     <section class="availability" aria-labelledby="dispo-title">
-        <style>
-            .dispo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:.75rem;margin:.5rem 0 1rem;}
-            .dispo-day{border:1px solid var(--mist-100,#EFEAE2);border-radius:14px;padding:.6rem .55rem;background:var(--surface,#fff);}
-            .dispo-day h3{font:600 .9rem/1.2 var(--font-body,sans-serif);text-align:center;margin:.1rem 0 .55rem;color:var(--sage-700,#2F4F43);}
-            .dispo-day ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.35rem;}
-            .slot{display:block;text-align:center;padding:.42rem;border-radius:8px;font-weight:600;font-size:.9rem;text-decoration:none;}
-            .slot--free{background:#EAF3EE;color:#1f6b49;border:1px solid #bfdccb;transition:background .15s,transform .15s;}
-            .slot--free:hover,.slot--free:focus-visible{background:#1f6b49;color:#fff;transform:translateY(-1px);}
-            .slot--off{background:#F2EFEA;color:#aab2ac;text-decoration:line-through;cursor:not-allowed;}
-            .dispo-legend{display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.85rem;color:var(--sage-700,#2F4F43);}
-            .dispo-legend span{display:inline-flex;align-items:center;gap:.4rem;}
-            .dispo-dot{width:.8rem;height:.8rem;border-radius:3px;display:inline-block;}
-        </style>
         <h2 id="dispo-title">Prochaines disponibilités</h2>
         <p class="muted">
             <?php if ($loggedIn): ?>
@@ -140,8 +123,8 @@ $loggedIn     = Auth::check();
                 <?php endforeach; ?>
             </div>
             <p class="dispo-legend">
-                <span><i class="dispo-dot" style="background:#EAF3EE;border:1px solid #bfdccb;"></i> Libre</span>
-                <span><i class="dispo-dot" style="background:#F2EFEA;"></i> Réservé / passé</span>
+                <span><i class="dispo-dot dispo-dot--free" aria-hidden="true"></i> Libre</span>
+                <span><i class="dispo-dot dispo-dot--off" aria-hidden="true"></i> Réservé / passé</span>
             </p>
         <?php endif; ?>
     </section>

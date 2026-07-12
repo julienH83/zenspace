@@ -125,6 +125,10 @@ function initCatalogueFilters() {
             ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
+    // Icône SVG horloge (identique à icons.php côté serveur), pour rester
+    // cohérent avec le rendu PHP lorsque la carte est régénérée en JS.
+    const CLOCK_SVG = '<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>';
+
     // Carte de prestation premium : média + badge prix, puce catégorie, CTA.
     function cardHtml(s) {
         const href = '/prestation/' + encodeURIComponent(s.slug);
@@ -143,7 +147,7 @@ function initCatalogueFilters() {
                     <span class="tag-chip">${escapeHtml(s.category_label)}</span>
                     <h3><a href="${href}">${escapeHtml(s.title)}</a></h3>
                     ${starsHtml(s.rating_avg, s.rating_count)}
-                    <p class="meta meta-duration">${s.duration_min} min</p>
+                    <p class="meta meta-duration">${CLOCK_SVG}<span>${s.duration_min}&nbsp;min</span></p>
                     <a class="btn btn-primary btn-sm card-cta" href="${href}">Réserver ce soin</a>
                 </div>
             </article>`;
