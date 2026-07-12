@@ -83,9 +83,14 @@ Contraste fort entre un serif de luxe (titres, immenses) et un sans-serif net
 
 - **Icônes** : jeu SVG *inline* (aucune dépendance externe), trait fin 1.6,
   `currentColor` (héritent la couleur du texte). Cf. `Views/partials/icons.php`.
-- **Logo / wordmark** : une pastille carrée à coins arrondis portant l'initiale
-  « Z » (fond **or**, encre foncée) accolée au nom « ZenSpace » en serif — repère
-  de marque simple, présent en en-tête et en pied de page.
+  Six icônes maison couvrent l'ensemble du site : *leaf*, *hands*, *calendar*,
+  *sparkle*, *heart*, *clock*, *phone*, *pin*.
+- **Logo / monogramme** : sceau circulaire à double filet or, orné d'une petite
+  étoile à quatre branches en haut et de deux filets latéraux, avec un « Z »
+  serif italique dessiné en chemins vectoriels au centre. Tracé mathématiquement
+  en SVG (aucun texte dépendant d'une police) — net à toute taille, du favicon
+  16 × 16 aux bannières. Sert d'identifiant unique en en-tête, en pied de page
+  et comme favicon. Cf. `Views/partials/brand_mark.php`.
 
 ### 2.5 Inventaire des composants
 
@@ -110,9 +115,9 @@ Wireframes basse fidélité (zoning) — la hiérarchie et les blocs, sans le st
 
 ```
 ┌──────────────────────────────────────────────┐
-│ ☎ 05 56… · Lun–Ven 9h–18h        1 rue du Spa │  barre utilitaire
+│ (tel) 05 56… (h) Lun-Ven 9h-18h (pin) 1 rue du Spa │  barre utilitaire (3 icônes SVG)
 ├──────────────────────────────────────────────┤
-│ [Z] ZenSpace   Accueil Prestations Contact   Connexion [Réserver] │  en-tête sticky
+│ (sceau) ZenSpace   Accueil Prestations Contact   Connexion [Réserver] │  en-tête sticky
 ├──────────────────────────────────────────────┤
 │  HÉRO deux colonnes                            │
 │  Kicker · Titre · Sous-titre        │  [photo] │
