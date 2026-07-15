@@ -32,14 +32,31 @@ contact_message (indépendante)
 | `booking_status_history` | Historique des changements de statut d'une réservation |
 | `review` | Avis clients (validés avant publication) |
 | `contact_message` | Messages du formulaire de contact |
+| `loyalty_ledger` | Grand-livre des points de fidélité (ajouté par migration) |
+| `article` | Articles du magazine bien-être (ajouté par migration) |
 
 ### Choix techniques
 - **Clés étrangères** entre toutes les tables liées (intégrité référentielle).
 - **Contraintes CHECK** : prix ≥ 0, durée > 0, note entre 1 et 5.
+- **Type ENUM** pour le statut de réservation (`pending`/`confirmed`/`completed`/`cancelled`).
+- **Colonne générée** `slot_key` (STORED) : libère réellement un créneau annulé
+  tout en gardant l'unicité des créneaux actifs (migration de durcissement).
 - **Index** sur les colonnes fréquemment filtrées (email, statut, catégorie).
 - **Contrainte d'unicité** `uq_slot` : un créneau ne peut être réservé deux fois.
 - Accès **exclusivement via PDO en requêtes préparées** (anti-injection SQL).
-- Création par **scripts SQL** (`schema.sql` + `seed.sql`), sans ORM.
+- Création par **scripts SQL versionnés** (`schema.sql` + migrations), sans ORM.
+
+### Triggers — note moyenne maintenue automatiquement
+La note moyenne et le nombre d'avis validés d'une prestation sont **dénormalisés**
+sur la table `service` (`rating_avg`, `rating_count`) et tenus à jour par **trois
+triggers** sur la table `review` (`AFTER INSERT / UPDATE / DELETE`). Seuls les avis
+**validés** (`is_validated = 1`) sont comptés.
+
+Intérêt : le catalogue et la page d'accueil affichent les étoiles **sans recalcul
+ni jointure d'agrégation** à chaque requête ; la logique vit dans la base et reste
+cohérente quel que soit le point d'entrée (application, script SQL, modération).
+
+Voir `db/migrations/2026_07_10_triggers_ratings.sql`.
 
 ---
 

@@ -12,6 +12,9 @@ use App\Core\Flash;
 use App\Core\Seo;
 use App\Core\View;
 
+// Icônes SVG utilisées dans le layout (barre utilitaire).
+include_once __DIR__ . '/partials/icons.php';
+
 $user      = Auth::user();
 $isAdminUi = $layout_admin ?? false;
 $appName   = $_ENV['APP_NAME'] ?? 'ZenSpace';
@@ -25,44 +28,68 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/logo-mark.svg">
     <?= Seo::tags($seo ?? []) ?>
-    <!-- Polices Google : Fraunces (titres, serif raffiné) + Inter (texte) -->
+    <!-- Polices : Cormorant Garamond (titres, serif de luxe) + Inter (interface/texte) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <?php $cssV = @filemtime(($_SERVER['DOCUMENT_ROOT'] ?? '') . '/assets/css/app.css'); ?>
     <link rel="stylesheet" href="/assets/css/app.css<?= $cssV ? '?v=' . $cssV : '' ?>">
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu</a>
 
+<!-- Barre utilitaire : coordonnées et horaires, comme sur un site d'entreprise. -->
+<div class="topbar">
+    <div class="container topbar-inner">
+        <a href="tel:+33556000000" class="topbar-item">
+            <?= icon('phone', 'icon-inline') ?><span>05&nbsp;56&nbsp;00&nbsp;00&nbsp;00</span>
+        </a>
+        <span class="topbar-item">
+            <?= icon('clock', 'icon-inline') ?><span>Lun–Ven 9h–18h · Sam 9h–13h</span>
+        </span>
+        <span class="topbar-item topbar-addr">
+            <?= icon('pin', 'icon-inline') ?><span>1 rue du Spa, 33000 Bordeaux</span>
+        </span>
+    </div>
+</div>
+
 <header class="site-header">
     <div class="container header-inner">
-        <a href="/" class="brand"><?= View::e($appName) ?></a>
+        <a href="/" class="brand"><?php include __DIR__ . '/partials/brand_mark.php'; ?><?= View::e($appName) ?></a>
 
-        <nav class="main-nav" aria-label="Navigation principale">
-            <a href="/"<?= $navCurrent('/') ?>>Accueil</a>
-            <a href="/prestations"<?= $navCurrent('/prestations') ?>>Prestations</a>
-            <a href="/contact"<?= $navCurrent('/contact') ?>>Contact</a>
-            <?php if ($user && in_array($user['role'], ['employe', 'admin'], true)): ?>
-                <a href="/admin"<?= $navCurrent('/admin') ?>>Espace gestion</a>
-            <?php endif; ?>
-        </nav>
-
-        <div class="auth-nav">
-            <?php if ($user): ?>
-                <?php if ($user['role'] === 'client'): ?>
-                    <a href="/mon-compte">Mon compte</a>
+        <?php // Bloc replié en menu hamburger sur mobile (voir app.js / .nav-collapse). ?>
+        <div class="nav-collapse" id="primary-nav">
+            <nav class="main-nav" aria-label="Navigation principale">
+                <a href="/"<?= $navCurrent('/') ?>>Accueil</a>
+                <a href="/prestations"<?= $navCurrent('/prestations') ?>>Prestations</a>
+                <a href="/contact"<?= $navCurrent('/contact') ?>>Contact</a>
+                <?php if ($user && in_array($user['role'], ['employe', 'admin'], true)): ?>
+                    <a href="/admin"<?= $navCurrent('/admin') ?>>Espace gestion</a>
                 <?php endif; ?>
-                <span class="user-hello">Bonjour, <?= View::e($user['first_name']) ?></span>
-                <form action="/deconnexion" method="post" class="inline-form">
-                    <?= Csrf::field() ?>
-                    <button type="submit" class="btn btn-ghost btn-sm">Déconnexion</button>
-                </form>
-            <?php else: ?>
-                <a href="/connexion" class="btn btn-ghost btn-sm">Connexion</a>
-                <a href="/inscription" class="btn btn-primary btn-sm">Créer un compte</a>
-            <?php endif; ?>
+            </nav>
+            <div class="auth-links">
+                <?php if ($user): ?>
+                    <?php if ($user['role'] === 'client'): ?>
+                        <a href="/mon-compte" class="nav-link-plain">Mon compte</a>
+                    <?php endif; ?>
+                    <form action="/deconnexion" method="post" class="inline-form">
+                        <?= Csrf::field() ?>
+                        <button type="submit" class="btn btn-ghost btn-sm">Déconnexion</button>
+                    </form>
+                <?php else: ?>
+                    <a href="/connexion" class="nav-link-plain">Connexion</a>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <a href="/prestations" class="btn btn-primary btn-sm">Réserver</a>
+            <button type="button" class="nav-toggle" id="nav-toggle"
+                    aria-controls="primary-nav" aria-expanded="false" aria-label="Ouvrir le menu">
+                <span class="nav-toggle-box" aria-hidden="true"><span class="nav-toggle-bar"></span></span>
+            </button>
         </div>
     </div>
 </header>
@@ -97,6 +124,7 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
                     <a href="/admin/prestations"<?= $navSection('/admin/prestations') ?>>Prestations</a>
                     <a href="/admin/reservations"<?= $navSection('/admin/reservations') ?>>Réservations</a>
                     <a href="/admin/avis"<?= $navSection('/admin/avis') ?>>Avis</a>
+                    <a href="/admin/magazine"<?= $navSection('/admin/magazine') ?>>Magazine</a>
                     <?php if ($user && $user['role'] === 'admin'): ?>
                         <a href="/admin/employes"<?= $navSection('/admin/employes') ?>>Employés</a>
                         <a href="/admin/statistiques"<?= $navSection('/admin/statistiques') ?>>Statistiques</a>
@@ -114,9 +142,18 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
 
 <footer class="site-footer">
     <div class="container footer-inner">
+        <div class="footer-brand">
+            <span class="brand brand-footer"><?php include __DIR__ . '/partials/brand_mark.php'; ?><?= View::e($appName) ?></span>
+            <p>Institut de bien-être à Bordeaux. Massages, soins du visage, spa &amp; hammam, sur réservation.</p>
+            <a href="/prestations" class="btn btn-primary btn-sm">Prendre rendez-vous</a>
+        </div>
         <div>
-            <strong><?= View::e($appName) ?></strong>
-            <p>Institut de bien-être — 1 rue du Spa, 33000 Bordeaux</p>
+            <h2>Coordonnées</h2>
+            <ul class="footer-links">
+                <li>1 rue du Spa, 33000 Bordeaux</li>
+                <li><a href="tel:+33556000000">05 56 00 00 00</a></li>
+                <li><a href="/contact">Formulaire de contact</a></li>
+            </ul>
         </div>
         <div>
             <h2>Horaires</h2>
@@ -126,16 +163,21 @@ $navSection  = static fn(string $path): string => ($path === $currentPath || str
                 <li>Dimanche : fermé</li>
             </ul>
         </div>
-        <div>
-            <h2>Informations</h2>
-            <a href="/contact">Nous contacter</a>
-        </div>
+        <nav aria-label="Liens de bas de page">
+            <h2>Explorer</h2>
+            <ul class="footer-links">
+                <li><a href="/prestations">Nos prestations</a></li>
+                <li><a href="/magazine">Magazine bien-être</a></li>
+                <li><a href="/contact">Nous contacter</a></li>
+            </ul>
+        </nav>
     </div>
     <div class="footer-bottom">
         <small>© <?= date('Y') ?> <?= View::e($appName) ?> — Tous droits réservés. Projet DWWM.</small>
     </div>
 </footer>
 
-<script src="/assets/js/app.js" defer></script>
+<?php $jsV = @filemtime(($_SERVER['DOCUMENT_ROOT'] ?? '') . '/assets/js/app.js'); ?>
+<script src="/assets/js/app.js<?= $jsV ? '?v=' . $jsV : '' ?>" defer></script>
 </body>
 </html>

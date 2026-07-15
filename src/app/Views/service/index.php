@@ -44,18 +44,7 @@ $fMaxDuration = (int) ($filters['max_duration'] ?? 0) ?: 120;
     <?php else: ?>
         <div class="grid">
             <?php foreach ($services as $s): ?>
-                <a class="card card-link" href="/prestation/<?= e($s['slug']) ?>">
-                    <?php if (!empty($s['image'])): ?>
-                        <div class="card-media">
-                            <img src="/assets/images/<?= e($s['image']) ?>" alt="" loading="lazy">
-                        </div>
-                    <?php endif; ?>
-                    <div class="card-body">
-                        <span class="tag"><?= e($s['category_label']) ?></span>
-                        <h3><?= e($s['title']) ?></h3>
-                        <p class="meta"><?= (int) $s['duration_min'] ?> min · <span class="price"><?= price($s['price']) ?></span></p>
-                    </div>
-                </a>
+                <?php include __DIR__ . '/../partials/service_card.php'; ?>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>

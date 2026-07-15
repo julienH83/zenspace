@@ -10,6 +10,7 @@ Projet réalisé dans le cadre du Titre Professionnel **DWWM (RNCP37674)**.
 | [JOURNAL.md](JOURNAL.md) | **Journal complet** de toutes les évolutions (chronologique) : correctifs, refontes, ajouts, retraits. |
 | [IMPLEMENTATION.md](IMPLEMENTATION.md) | État **actuel** du projet : ce qui est livré et vérifié, fonctionnalités, comment activer les options de prod. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Architecture MVC orientée objet : couches, classes, flux d'une requête, preuves POO. |
+| [MAQUETTAGE.md](MAQUETTAGE.md) | **Conception** (CP2) : charte graphique, wireframes des pages clés, parcours utilisateurs. |
 | [DESIGN.md](DESIGN.md) | Direction visuelle « minimaliste magazine » : palette, typographie, composants, accessibilité RGAA. |
 | [SECURITE.md](SECURITE.md) | Mesures de sécurité (auth, CSRF, injections, en-têtes, rate-limiting…). |
 | [BASE_DE_DONNEES.md](BASE_DE_DONNEES.md) | Schéma relationnel + MongoDB, choix de conception. |
@@ -26,6 +27,7 @@ docker exec -i zenspace_mysql mysql -uroot -proot zenspace < db/schema.sql
 docker exec -i zenspace_mysql mysql -uroot -proot zenspace < db/seed.sql
 docker exec -i zenspace_mysql mysql -uroot -proot zenspace < db/migrations/2026_06_01_hardening.sql
 docker exec -i zenspace_mysql mysql -uroot -proot zenspace < db/seed_articles.sql
+docker exec -i zenspace_mysql mysql -uroot -proot zenspace < db/migrations/2026_07_10_triggers_ratings.sql
 ```
 → http://localhost:8080
 
